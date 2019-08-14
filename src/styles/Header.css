@@ -1,0 +1,16 @@
+.App-header {
+    min-height: 30px;
+    color: black;
+  }
+  
+  .Header-logo {
+    float: left !important;
+    height: 40px;
+    padding: 20px;
+  }
+  
+  .Header-heading {
+    float: center;
+    text-align: center;
+    padding: 20px;
+  }
