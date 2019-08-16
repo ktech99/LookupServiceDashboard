@@ -1,47 +1,7 @@
 .App-sidebar{
-    float: left;
-    max-width: 10%;
-    border-right: 1px solid grey;
-    height: 100vh;
+    /* float: left; */
+    /* max-width: 10%;
+    border-right: 1px solid grey; */
+    height: 10px;
     text-align: center;
 }
-
-button{
-    background:#1AAB8A;
-    color:#fff;
-    border:none;
-    position:relative;
-    height:50px;
-    font-size:1.0em;
-    padding:0 2em;
-    cursor:pointer;
-    transition:800ms ease all;
-    outline:none;
-    margin: 20px;
-    margin-top: 100%;
-    border-radius:5px;
-  }
-  button:hover{
-    background:#fff;
-    color:#1AAB8A;
-  }
-  button:before,button:after{
-    content:'';
-    position:absolute;
-    top:0;
-    right:0;
-    height:2px;
-    width:0;
-    background: #1AAB8A;
-    transition:400ms ease all;
-  }
-  button:after{
-    right:inherit;
-    top:inherit;
-    left:0;
-    bottom:0;
-  }
-  button:hover:before,button:hover:after{
-    width:100%;
-    transition:800ms ease all;
-  }
