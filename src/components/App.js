@@ -8,22 +8,73 @@ import ServiceTable from "./ServiceTable"
 import HostTable from "./HostTable"
 import { Row, Col, Container, Dropdown, DropdownButton, Accordion, Card, Button, ListGroup } from 'react-bootstrap'
 
+
 class App extends Component {
+
   constructor() {
     super();
     this.state = {
-      results: {}
+      communities: [],
+      services: []
     }
+    this.communityChoose = this.communityChoose.bind(this); 
+    this.communityList = this.communityList.bind(this);
+    this.serviceList = this.serviceList.bind(this);
+    this.serviceChoose = this.serviceChoose.bind(this);
   }
 
   componentDidMount() {
-    fetch('http://jsonplaceholder.typicode.com/users')
-    .then(res => res.json())
-    .then((data) => {
-      // this.setState({ results: data })
-      console.log(data)
-    })
-    .catch(console.log)
+
+    fetch('http://localhost:8080/groupCommunities', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({ communities: data })
+        //console.log(this.state.communities)
+      })
+      .catch(console.log)
+  }
+
+  communityList(props) {
+    const communities = props.communities;
+    const listCommunities = communities.map((community) =>
+      <ListGroup.Item key={community} as={Button} action onClick={() => {this.communityChoose({community})}}>
+        {community}
+      </ListGroup.Item>
+    );
+    return (
+      <ListGroup>{listCommunities}</ListGroup>
+    );
+  }
+
+   communityChoose(element) {
+    let self = this;
+    fetch('http://localhost:8080/services', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+        .then(function(response){
+          return response.json();
+        })
+        .then(function(data) {
+          self.setState({ services: data })
+          console.log(data)
+        })
+        .catch(console.log)
+    console.log(element.community);
+  }
+
+  serviceList(props) {
+    const services = props.services;
+    const listServices = services.map((service) =>
+      <ListGroup.Item key={service} as={Button} action onClick={function(){this.serviceChoose({service})}}>
+        {service}
+      </ListGroup.Item>
+    );
+    return (
+      <ListGroup>{listServices}</ListGroup>
+    );
+  }
+
+  serviceChoose(element) {
+  
+    console.log(element.service);
   }
 
   render() {
@@ -36,43 +87,40 @@ class App extends Component {
         </div>
         <Container>
           <Row>
-            <Col >
+            <Col>
               <Accordion>
                 <Card>
                   <Card.Header>
                     <Accordion.Toggle as={Button} variant="link" eventKey="0">
                       Communities
-      </Accordion.Toggle>
+                    </Accordion.Toggle>
                   </Card.Header>
                   <Accordion.Collapse eventKey="0">
-                    <Card.Body>
-                      <ListGroup>
-                        <ListGroup.Item>Cras justo odio</ListGroup.Item>
-                        <ListGroup.Item>Dapibus ac facilisis in</ListGroup.Item>
-                        <ListGroup.Item>Morbi leo risus</ListGroup.Item>
-                        <ListGroup.Item>Porta ac consectetur ac</ListGroup.Item>
-                        <ListGroup.Item>Vestibulum at eros</ListGroup.Item>
+                    <Card.Body >
+                    <ListGroup defaultActiveKey="#link1">
+                      <this.communityList communities={this.state.communities} />
                       </ListGroup>
                     </Card.Body>
                   </Accordion.Collapse>
                 </Card>
+                
                 <Card>
                   <Card.Header>
                     <Accordion.Toggle as={Button} variant="link" eventKey="1">
-                      Browser
-      </Accordion.Toggle>
+                      Service Type
+                    </Accordion.Toggle>
                   </Card.Header>
                   <Accordion.Collapse eventKey="1">
                     <Card.Body>
                       <ListGroup>
-                        <ListGroup.Item>Empty</ListGroup.Item>
+                        <this.serviceList services = {this.state.services}/>
                       </ListGroup>
                     </Card.Body>
                   </Accordion.Collapse>
                 </Card>
               </Accordion>
             </Col>
-            <Col xs={6}>2 of 2</Col>
+            <Col >2 of 2</Col>
           </Row>
         </Container>
       </div>
@@ -80,6 +128,5 @@ class App extends Component {
   }
 
 };
-
 
 export default App;
