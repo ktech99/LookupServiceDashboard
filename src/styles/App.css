@@ -43,7 +43,22 @@
 
 .sidebar{
   float: left;
+  height: 100vh;
+  /* text-align: center; */
   max-width: 100px;
+  background-color:#e9e9e9;
+}
+
+.container{
+  float: left;
+}
+
+.scrollBox{
+  height:230px;
+  width:100%;
+  /* border:1px solid #ccc; */
+  font:16px/26px Georgia, Garamond, Serif;
+  overflow:auto;
 }
 
 /* When the screen is less than 600px wide, stack the links and the search field vertically instead of horizontally */
@@ -60,3 +75,5 @@
     border: 1px solid #ccc;
   }
 }
+
+

@@ -1,12 +1,7 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
 import logo from "../image/Logo.png";
-import Header from './Header'
-import Sidebar from './Sidebar'
-import MapWithMarkers from "./Map"
-import ServiceTable from "./ServiceTable"
-import HostTable from "./HostTable"
-import { Row, Col, Container, Dropdown, DropdownButton, Accordion, Card, Button, ListGroup } from 'react-bootstrap'
+import { Row, Col, Container, Accordion, Card, Button, ListGroup } from 'react-bootstrap'
 
 
 class App extends Component {
@@ -15,7 +10,8 @@ class App extends Component {
     super();
     this.state = {
       communities: [],
-      services: []
+      services: [],
+      serviceMap: {}
     }
     this.communityChoose = this.communityChoose.bind(this); 
     this.communityList = this.communityList.bind(this);
@@ -48,22 +44,27 @@ class App extends Component {
 
    communityChoose(element) {
     let self = this;
-    fetch('http://localhost:8080/services', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/services?serviceName='+element.community, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
         .then(function(response){
           return response.json();
         })
         .then(function(data) {
-          self.setState({ services: data })
-          console.log(data)
+          // console.log(Object.keys(data));
+          self.setState({ services: Object.keys(data) })
+          self.setState({serviceMap: data})
+          var accID = document.getElementById('communityCard');
+          accID.click();
+          var serviceId = document.getElementById("serviceTypeCard");
+          serviceId.click();
+          console.log(self.state.serviceMap)
         })
         .catch(console.log)
-    console.log(element.community);
   }
 
   serviceList(props) {
     const services = props.services;
     const listServices = services.map((service) =>
-      <ListGroup.Item key={service} as={Button} action onClick={function(){this.serviceChoose({service})}}>
+      <ListGroup.Item key={service} as={Button} action onClick={() => {this.serviceChoose({service})}}>
         {service}
       </ListGroup.Item>
     );
@@ -73,7 +74,10 @@ class App extends Component {
   }
 
   serviceChoose(element) {
-  
+    var serviceId = document.getElementById("serviceTypeCard");
+    serviceId.click();
+    var hostId = document.getElementById("hostNameCard");
+    hostId.click();
     console.log(element.service);
   }
 
@@ -81,24 +85,26 @@ class App extends Component {
     return (
       <div>
         <div className="topnav">
-          <img src={logo}></img>
+          <img src={logo} alt="perfSONAR logo"></img>
           <input type="text" placeholder="Search.." />
           <button className="SearchButton">Search</button>
         </div>
-        <Container>
+        <Container >
           <Row>
-            <Col>
-              <Accordion>
+            <Col className = "sidebar">
+              <Accordion defaultActiveKey="0">
                 <Card>
                   <Card.Header>
-                    <Accordion.Toggle as={Button} variant="link" eventKey="0">
+                    <Accordion.Toggle as={Button} variant="link" eventKey="0" id = "communityCard">
                       Communities
                     </Accordion.Toggle>
                   </Card.Header>
                   <Accordion.Collapse eventKey="0">
                     <Card.Body >
-                    <ListGroup defaultActiveKey="#link1">
-                      <this.communityList communities={this.state.communities} />
+                      <ListGroup defaultActiveKey="#link1">
+                        <div className="scrollBox">
+                        <this.communityList communities={this.state.communities} />
+                        </div>
                       </ListGroup>
                     </Card.Body>
                   </Accordion.Collapse>
@@ -106,21 +112,43 @@ class App extends Component {
                 
                 <Card>
                   <Card.Header>
-                    <Accordion.Toggle as={Button} variant="link" eventKey="1">
+                    <Accordion.Toggle as={Button} variant="link" eventKey="1" id="serviceTypeCard">
                       Service Type
                     </Accordion.Toggle>
                   </Card.Header>
                   <Accordion.Collapse eventKey="1">
                     <Card.Body>
                       <ListGroup>
-                        <this.serviceList services = {this.state.services}/>
+                        <div className="scrollBox">
+                          <this.serviceList services = {this.state.services}/>
+                        </div>
                       </ListGroup>
                     </Card.Body>
                   </Accordion.Collapse>
                 </Card>
+
+                <Card>
+                  <Card.Header>
+                    <Accordion.Toggle as={Button} variant="link" eventKey="2" id="hostNameCard">
+                      Host Name
+                    </Accordion.Toggle>
+                  </Card.Header>
+                  <Accordion.Collapse eventKey="2">
+                    <Card.Body>
+                      <ListGroup>
+                        <div className="scrollBox">
+                          {/* <this.serviceList services = {this.state.services}/> */}
+                        </div>
+                      </ListGroup>
+                    </Card.Body>
+                  </Accordion.Collapse>
+                </Card>
+
               </Accordion>
             </Col>
-            <Col >2 of 2</Col>
+            <Col >
+            2 of 2
+            </Col>
           </Row>
         </Container>
       </div>
