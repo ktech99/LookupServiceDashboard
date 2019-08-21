@@ -11,7 +11,8 @@ class App extends Component {
     this.state = {
       communities: [],
       services: [],
-      serviceMap: {}
+      serviceMap: {},
+      serviceDetails: []
     }
     this.communityChoose = this.communityChoose.bind(this); 
     this.communityList = this.communityList.bind(this);
@@ -78,7 +79,34 @@ class App extends Component {
     serviceId.click();
     var hostId = document.getElementById("hostNameCard");
     hostId.click();
-    console.log(element.service);
+    var detailsArray = [];
+    for(var i in this.state.serviceMap){
+      // alert(i); // alerts key
+      // alert(foo[i]); //alerts key's value
+      if(i === element.service){
+        detailsArray.push(this.state.serviceMap[i]);
+      }
+    }
+    this.setState({serviceDetails: detailsArray});
+  }
+
+  hostList(props) {
+    const hosts = props.serviceDetails;
+    console.log(hosts);
+    for(var i in hosts){
+        var host = hosts[i];
+        console.log(host)  
+    }
+    // const listServices = hosts.map((host) =>
+    //   <ListGroup.Item key={host} as={Button} action onClick={() => {this.serviceChoose({host})}}>
+    //     {host}
+    //   </ListGroup.Item>
+    // );
+    return (
+      <ListGroup>
+        
+      </ListGroup>
+    );
   }
 
   render() {
@@ -137,7 +165,7 @@ class App extends Component {
                     <Card.Body>
                       <ListGroup>
                         <div className="scrollBox">
-                          {/* <this.serviceList services = {this.state.services}/> */}
+                          <this.hostList serviceDetails = {this.state.serviceDetails}/>
                         </div>
                       </ListGroup>
                     </Card.Body>
