@@ -61,6 +61,31 @@ public class Requests {
         return communities;
     }
 
+    @GetMapping("/pSchedulerTests")
+    public Set<String> getPSchedulerTests() throws IOException {
+        RestHighLevelClient client = initClient();
+        SearchResponse searchResponse = searchResponse(client);
+        SearchHit[] searchHits = searchResponse.getHits().getHits();
+        Set<String> schedulers = new TreeSet<String>();
+        for (SearchHit hit : searchHits) {
+            String scheduler = "";
+            try {
+                scheduler = (hit.getSourceAsMap()).get("pscheduler-tests").toString();
+            }catch (Exception e){
+                //todo
+            }
+            scheduler = scheduler.replace("[","").replace("]","");
+            String[] schedulerArr = scheduler.split(",");
+            for (String s : schedulerArr) {
+                if(!s.trim().equals("")) {
+                    schedulers.add(s.trim());
+                }
+            }
+        }
+        client.close();
+        return schedulers;
+    }
+
     @GetMapping("/services")
     @ResponseBody
     public Map<String, List<Map>> getServices(@RequestParam String serviceName) throws IOException {
