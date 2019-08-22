@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 @RestController
 public class Requests {
@@ -41,7 +42,6 @@ public class Requests {
         SearchHit[] searchHits = searchResponse.getHits().getHits();
         Set<String> communities = new TreeSet<String>();
         for (SearchHit hit : searchHits) {
-//            System.out.println(hit.getSourceAsMap());
             String community = "";
             try {
                 community = (hit.getSourceAsMap()).get("group-communities").toString();
@@ -75,7 +75,8 @@ public class Requests {
         for (SearchHit hit : hits) {
             String service = "";
             try {
-                service = (hit.getSourceAsMap()).get("service-name").toString();
+//                System.out.println(hit.getSourceAsMap());
+                service = (hit.getSourceAsMap()).get("service-type").toString();
                 service = service.replace("[","").replace("]","");
                 if(serviceMap.containsKey(service)) {
                     serviceMap.get(service).add(hit.getSourceAsMap());
@@ -91,10 +92,42 @@ public class Requests {
             }
         }
         client.close();
-//        System.out.println(serviceMap.keySet());
         return serviceMap;
     }
 
+    @GetMapping("/host")
+    public String getHost(@RequestParam String serviceHost) throws IOException {
+        RestHighLevelClient client = initClient();
+        SearchResponse searchResponse = searchHostResponse(client, serviceHost);
+        String scrollId = searchResponse.getScrollId();
+        SearchHits hits = searchResponse.getHits();
+
+
+        Map<String, List<Map>> serviceMap = new TreeMap<>();
+
+        for (SearchHit hit : hits) {
+            System.out.println(hit.getSourceAsMap());
+//            String service = "";
+//            try {
+////                System.out.println(hit.getSourceAsMap());
+//                service = (hit.getSourceAsMap()).get("service-type").toString();
+//                service = service.replace("[","").replace("]","");
+//                if(serviceMap.containsKey(service)) {
+//                    serviceMap.get(service).add(hit.getSourceAsMap());
+//                }else {
+//                    List<Map> serviceList = new ArrayList<>();
+//                    serviceList.add(hit.getSourceAsMap());
+//
+//                    serviceMap.put(service, serviceList);
+//                }
+//            }catch (Exception e){
+//                //todo
+////                e.printStackTrace();
+//            }
+        }
+        client.close();
+        return "{}";
+    }
 
 
     private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
@@ -112,7 +145,18 @@ public class Requests {
         SearchRequest searchRequest = new SearchRequest("lookup");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         searchSourceBuilder.size(10000);
-        searchSourceBuilder.query(matchQuery("group-communities", term));
+        searchSourceBuilder.query(termQuery("group-communities.keyword", term));
+        searchRequest.source(searchSourceBuilder);
+        return client.search(searchRequest, RequestOptions.DEFAULT);
+    }
+
+    private SearchResponse searchHostResponse(RestHighLevelClient client, String term) throws IOException {
+        SearchRequest searchRequest = new SearchRequest("lookup");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.size(10000);
+//        searchSourceBuilder.query(matchQuery());
+        System.out.println(term);
+        searchSourceBuilder.query(termQuery("type.keyword", "host"));
         searchRequest.source(searchSourceBuilder);
         return client.search(searchRequest, RequestOptions.DEFAULT);
     }
