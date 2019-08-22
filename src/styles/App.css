@@ -33,6 +33,18 @@
   margin: 10px;
 }
 
-input:focus, textarea:focus, select:focus{
-  outline: none;
+.schedulerCheckBox{
+  margin:10px;
+  width: 25px;
+  background-color: #eee;
+}
+
+.submitButton{
+  margin-top:20px;
+}
+
+.scrollBox{
+  height: auto;
+  max-height: 200px;
+  overflow-x: hidden;
 }

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
 import logo from "../image/Logo.png";
-import { Jumbotron, Button, ListGroup, Dropdown } from 'react-bootstrap'
+import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar } from 'react-bootstrap'
+
 
 
 class App extends Component {
@@ -9,9 +10,9 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      communities: [],
+      groupCommunities: [],
     }
-    // this.NavBar = this.NavBar.bind(this);
+    this.getCommunities = this.getCommunities.bind(this);
   }
 
   componentDidMount() {
@@ -19,20 +20,24 @@ class App extends Component {
     fetch('http://localhost:8080/groupCommunities', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        this.setState({ communities: data })
+        this.setState({ groupCommunities: data })
       })
       .catch(console.log)
   }
 
-  communityList(props) {
+  getCommunities(props) {
     const communities = props.communities;
     const listCommunities = communities.map((community) =>
-      <ListGroup.Item key={community} as={Button} action onClick={() => { this.communityChoose({ community }) }}>
+      <Dropdown.Item  id = {community} key= {community} as={Button}  onClick={() => { 
+        var current = document.getElementById("communitiesdropDown");
+        current.textContent = {community}.community; // changing dropdown name
+       }}>
+        {/* todo onclick */}
         {community}
-      </ListGroup.Item>
+      </Dropdown.Item>
     );
     return (
-      <ListGroup>{listCommunities}</ListGroup>
+      <Dropdown.Menu className="scrollBox">{listCommunities}</Dropdown.Menu>
     );
   }
 
@@ -46,26 +51,27 @@ class App extends Component {
         </div>
         <div className="dropdownDiv">
           <Dropdown className="dropdownDiv">
-            <Dropdown.Toggle variant="dark" id="dropdown-basic">
+            <Dropdown.Toggle variant="dark" id="communitiesdropDown">
               Group communities
             </Dropdown.Toggle>
-
-            <Dropdown.Menu>
-              <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-              <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-              <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-            </Dropdown.Menu>
+              <this.getCommunities communities={this.state.groupCommunities} />
           </Dropdown>
 
           <Dropdown className="dropdownDiv">
             <Dropdown.Toggle variant="dark" id="dropdown-basic">
-              Group communities
+              pScheduler Tests
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <input type="checkbox" placeholder="Field Name.." className="searchBarField" />
+              <label>
+                <input type="checkbox" className="schedulerCheckBox" />
+                One
+              </label>
             </Dropdown.Menu>
           </Dropdown>
+        </div>
+        <div className="submitButton">
+          <Button variant="warning">Submit</Button>
         </div>
       </Jumbotron>
     );
