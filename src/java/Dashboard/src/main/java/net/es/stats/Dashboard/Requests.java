@@ -86,6 +86,20 @@ public class Requests {
         return schedulers;
     }
 
+    @GetMapping("/getAllKeys")
+    public Set<Object> getKeys() throws IOException {
+        RestHighLevelClient client = initClient();
+        SearchResponse searchResponse = searchResponse(client);
+        SearchHit[] searchHits = searchResponse.getHits().getHits();
+        Set<Object> keys = new TreeSet<>();
+        for (SearchHit hit :
+                searchHits) {
+            keys.addAll(hit.getSourceAsMap().keySet());
+
+        }
+        return keys;
+    }
+
     @GetMapping("/services")
     @ResponseBody
     public Map<String, List<Map>> getServices(@RequestParam String serviceName) throws IOException {

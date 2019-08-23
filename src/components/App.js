@@ -3,6 +3,7 @@ import '../styles/App.css';
 import logo from "../image/Logo.png";
 import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar } from 'react-bootstrap'
 import Search from "react-search"
+import { thisExpression } from '@babel/types';
 
 class App extends Component {
 
@@ -13,21 +14,11 @@ class App extends Component {
       selectedGroupCommunity: "",
       pSchedulerTests: [],
       chosenSchedulers: [],
-      items: [
-        { id: 0, value: 'ruby' },
-        { id: 1, value: 'javascript' },
-        { id: 2, value: 'lua' },
-        { id: 3, value: 'go' },
-        { id: 4, value: 'julia' },
-        { id: 5, value: 'p' }
-      ]
+      keys: [],
+      chosenKey: ""
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
-  }
-
-  HiItems(items) {
-    console.log(items)
   }
 
   componentDidMount() {
@@ -43,6 +34,14 @@ class App extends Component {
       .then(res => res.json())
       .then((data) => {
         this.setState({ pSchedulerTests: data })
+      })
+      .catch(console.log)
+
+      fetch('http://localhost:8080/getAllKeys', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      .then(res => res.json())
+      .then((data) => {
+        data = data.map(value => ({ id : 1, value: value }))      
+        this.setState({keys: data })
       })
       .catch(console.log)
   }
@@ -92,16 +91,20 @@ class App extends Component {
     );
   }
 
+  keySelect(items) {
+    this.setState({chosenKey: items});
+  }
+
 
   render() {
     return (
       <Jumbotron className="head">
         <div>
-          <Search items={this.state.items}
+          <Search items={this.state.keys}
             placeholder="Eneter a key (optional) : "
             maxSelected={1}
             multiple={true}
-            onItemsChanged={this.HiItems.bind(this)} className="searchBarField" id="test" />
+            onItemsChanged={this.keySelect.bind(this)} className="searchBarField" />
 
           {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
           <input type="text" placeholder="Search.." className="searchBar" />
