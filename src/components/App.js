@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import logo from "../image/Logo.png";
 import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar } from 'react-bootstrap'
-import { thisExpression } from '@babel/types';
-
-
+import Search from "react-search"
 
 class App extends Component {
 
@@ -14,10 +12,22 @@ class App extends Component {
       groupCommunities: [],
       selectedGroupCommunity: "",
       pSchedulerTests: [],
-      chosenSchedulers: []
+      chosenSchedulers: [],
+      items: [
+        { id: 0, value: 'ruby' },
+        { id: 1, value: 'javascript' },
+        { id: 2, value: 'lua' },
+        { id: 3, value: 'go' },
+        { id: 4, value: 'julia' },
+        { id: 5, value: 'p' }
+      ]
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
+  }
+
+  HiItems(items) {
+    console.log(items)
   }
 
   componentDidMount() {
@@ -40,15 +50,15 @@ class App extends Component {
   getCommunities(props) {
     const communities = props.communities;
     const listCommunities = communities.map((community) =>
-      <Dropdown.Item  id = {community} key= {community} as={Button}  
-      onClick={() => { 
-        var current = document.getElementById("communitiesdropDown");
-        current.textContent = {community}.community; // changing dropdown name
-        this.setState({selectedGroupCommunity : {community}.community})
-       }}>
+      <Dropdown.Item id={community} key={community} as={Button}
+        onClick={() => {
+          var current = document.getElementById("communitiesdropDown");
+          current.textContent = { community }.community; // changing dropdown name
+          this.setState({ selectedGroupCommunity: { community }.community })
+        }}>
         {/* todo onclick */}
         {community}
-      
+
       </Dropdown.Item>
     );
     return (
@@ -59,21 +69,21 @@ class App extends Component {
   getPschedulers(props) {
     const pSchedulers = props.pSchedulers;
     const listSchedulers = pSchedulers.map((scheduler) =>
-    <label key={scheduler}>
-      <input type="checkbox" className="schedulerCheckBox" id = {scheduler} onClick={() => { 
-        console.log(this.state.chosenSchedulers);
-        const contains = this.state.chosenSchedulers.includes({scheduler}.scheduler);
-        if(contains){
-          var remainingItems = this.state.chosenSchedulers.filter(function(scheduler) { return scheduler !== {scheduler}.scheduler });
-          this.setState({chosenSchedulers: remainingItems });
-        }else{
-          this.state.chosenSchedulers.push({scheduler}.scheduler)
-        } 
+      <label key={scheduler}>
+        <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
+          console.log(this.state.chosenSchedulers);
+          const contains = this.state.chosenSchedulers.includes({ scheduler }.scheduler);
+          if (contains) {
+            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) { return scheduler !== { scheduler }.scheduler });
+            this.setState({ chosenSchedulers: remainingItems });
+          } else {
+            this.state.chosenSchedulers.push({ scheduler }.scheduler)
+          }
 
-       }}> 
-       </input>
-      {scheduler}
-    </label>
+        }}>
+        </input>
+        {scheduler}
+      </label>
     );
     return (
       <Dropdown.Menu className="scrollBox">
@@ -87,7 +97,13 @@ class App extends Component {
     return (
       <Jumbotron className="head">
         <div>
-          <input type="text" placeholder="Field Name.." className="searchBarField" />
+          <Search items={this.state.items}
+            placeholder="Eneter a key (optional) : "
+            maxSelected={1}
+            multiple={true}
+            onItemsChanged={this.HiItems.bind(this)} className="searchBarField" id="test" />
+
+          {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
           <input type="text" placeholder="Search.." className="searchBar" />
         </div>
         <div className="dropdownDiv">
@@ -103,7 +119,7 @@ class App extends Component {
               pScheduler Tests
             </Dropdown.Toggle>
 
-            <this.getPschedulers pSchedulers = {this.state.pSchedulerTests}/>
+            <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
 
           </Dropdown>
         </div>
