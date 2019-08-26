@@ -52,7 +52,7 @@ class App extends Component {
       <Dropdown.Item id={community} key={community} as={Button}
         onClick={() => {
           var current = document.getElementById("communitiesdropDown");
-          current.textContent = { community }.community; // changing dropdown name
+          current.textContent = "Communities: "+ { community }.community; // changing dropdown name
           this.setState({ selectedGroupCommunity: { community }.community })
         }}>
         {/* todo onclick */}
