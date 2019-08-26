@@ -20,6 +20,11 @@
   margin: 10px;
 }
 
+/* Information tabs */
+.col-sm-2 {
+    margin: 10px;
+}
+
 /* Autofill css settings */
 .LBGII#search-input{
   border-radius: 5px !important;

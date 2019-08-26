@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
 import logo from "../image/Logo.png";
-import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar } from 'react-bootstrap'
+import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar, Table, Tab, Row, Col, Nav } from 'react-bootstrap'
 import Search from "react-search"
 import { thisExpression } from '@babel/types';
 
@@ -121,38 +121,91 @@ class App extends Component {
 
   render() {
     return (
-      <Jumbotron className="head">
-        <div>
-          <Search items={this.state.keys}
-            placeholder="Eneter a key (optional) : "
-            maxSelected={1}
-            multiple={true}
-            onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
+      <div>
+        <Jumbotron className="head">
+          <div>
+            <Search items={this.state.keys}
+              placeholder="Eneter a key (optional) : "
+              maxSelected={1}
+              multiple={true}
+              onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
 
-          {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
-          <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
-        </div>
-        <div className="dropdownDiv">
-          <Dropdown className="dropdownDiv">
-            <Dropdown.Toggle variant="dark" id="communitiesdropDown">
-              Group communities
+            {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
+            <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
+          </div>
+          <div className="dropdownDiv">
+            <Dropdown className="dropdownDiv">
+              <Dropdown.Toggle variant="dark" id="communitiesdropDown">
+                Group communities
             </Dropdown.Toggle>
-            <this.getCommunities communities={this.state.groupCommunities} />
-          </Dropdown>
+              <this.getCommunities communities={this.state.groupCommunities} />
+            </Dropdown>
 
-          <Dropdown className="dropdownDiv">
-            <Dropdown.Toggle variant="dark" id="dropdown-basic">
-              pScheduler Tests
+            <Dropdown className="dropdownDiv">
+              <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                pScheduler Tests
             </Dropdown.Toggle>
 
-            <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
+              <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
 
-          </Dropdown>
-        </div>
-        <div className="submitButton">
-          <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
-        </div>
-      </Jumbotron>
+            </Dropdown>
+          </div>
+          <div className="submitButton">
+            <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
+          </div>
+        </Jumbotron>
+
+        <Tab.Container id="informationTabs" defaultActiveKey="first" className = "informationTabs">
+          <Row>
+            <Col sm={2}>
+              <Nav variant="pills" className="flex-column">
+                <Nav.Item>
+                  <Nav.Link eventKey="first">Host Information</Nav.Link>
+                </Nav.Item>
+                <Nav.Item>
+                  <Nav.Link eventKey="second" disabled>Service Information</Nav.Link>
+                </Nav.Item>
+              </Nav>
+            </Col>
+            <Col sm={9}>
+              <Tab.Content>
+                <Tab.Pane eventKey="first">
+                  <Table striped bordered hover variant="dark">
+                    <thead>
+                      <tr>
+                        <th>Host Name</th>
+                        <th>Hardware</th>
+                        <th>System Info</th>
+                        <th>Toolkit-Version</th>
+                        <th>Communities</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>1</td>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                        <td>ebbo</td>
+                      </tr>
+                      <tr>
+                        <td>2</td>
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                      </tr>
+                    </tbody>
+                  </Table>
+                </Tab.Pane>
+                <Tab.Pane eventKey="second">
+                  {/* <Sonnet /> */}
+                </Tab.Pane>
+              </Tab.Content>
+            </Col>
+          </Row>
+        </Tab.Container>
+
+      </div>
     );
   }
 
