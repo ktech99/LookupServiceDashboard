@@ -32,15 +32,15 @@ class App extends Component {
       })
       .catch(console.log)
 
-      fetch('http://localhost:8080/getAllKeys', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/getAllKeys', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        data = data.map(value => ({ id : 1, value: value }))      
-        this.setState({keys: data })
+        data = data.map(value => ({ id: 1, value: value }))
+        this.setState({ keys: data })
       })
       .catch(console.log)
 
-      fetch('http://localhost:8080/pSchedulerTests', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/pSchedulerTests', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ pSchedulerTests: data })
@@ -54,10 +54,9 @@ class App extends Component {
       <Dropdown.Item id={community} key={community} as={Button}
         onClick={() => {
           var current = document.getElementById("communitiesdropDown");
-          current.textContent = "Communities: "+ { community }.community; // changing dropdown name
+          current.textContent = "Communities: " + { community }.community; // changing dropdown name
           this.setState({ selectedGroupCommunity: { community }.community })
         }}>
-        {/* todo onclick */}
         {community}
 
       </Dropdown.Item>
@@ -93,33 +92,30 @@ class App extends Component {
     );
   }
 
-  updateSearch(){
-    // console.log(document.getElementById("searchBar"));
-    // console.log(items)
-    this.setState({searchTerm: document.getElementById("searchBar").value})
-    // console.log(this.state.searchTerm)
+  updateSearch() {
+    this.setState({ searchTerm: document.getElementById("searchBar").value })
   }
 
   keySelect(items) {
-    if(items.length !== 0){
-      this.setState({chosenKey: items});
+    if (items.length !== 0) {
+      this.setState({ chosenKey: items });
       console.log(items[0]["value"])
     }
   }
 
-  searchHost(){
-    if(this.state.chosenKey.length !== 0){
+  searchHost() {
+    if (this.state.chosenKey.length !== 0) {
       var key = this.state.chosenKey[0]["value"]
-    }else{
+    } else {
       var key = ""
     }
-    fetch('http://localhost:8080/search?key='+key+"&groupCommunity="+this.state.selectedGroupCommunity+"&pSchedulers="+this.state.chosenSchedulers+"&searchTerm="+this.state.searchTerm+"&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
-    .then(res => res.json())
-    .then((data) => {
-      // data = data.map(value => ({ id : 1, value: value }))      
-      // this.setState({keys: data })
-    })
-    .catch(console.log)
+    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      .then(res => res.json())
+      .then((data) => {
+        // data = data.map(value => ({ id : 1, value: value }))      
+        // this.setState({keys: data })
+      })
+      .catch(console.log)
   }
 
 
@@ -134,7 +130,7 @@ class App extends Component {
             onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
 
           {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
-          <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id ="searchBar"/>
+          <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
         </div>
         <div className="dropdownDiv">
           <Dropdown className="dropdownDiv">
@@ -154,7 +150,7 @@ class App extends Component {
           </Dropdown>
         </div>
         <div className="submitButton">
-          <Button variant="warning" onClick = {() => {this.searchHost()}}>Submit</Button>
+          <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
         </div>
       </Jumbotron>
     );

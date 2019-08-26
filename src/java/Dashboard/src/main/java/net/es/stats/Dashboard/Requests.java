@@ -13,7 +13,9 @@ import org.elasticsearch.client.RequestOptions;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -47,13 +49,13 @@ public class Requests {
             try {
                 community = (hit.getSourceAsMap()).get("group-communities").toString();
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 //todo
             }
-            community = community.replace("[","").replace("]","");
+            community = community.replace("[", "").replace("]", "");
             String[] communityArr = community.split(",");
             for (String s : communityArr) {
-                if(!s.trim().equals("")) {
+                if (!s.trim().equals("")) {
                     communities.add(s.trim());
                 }
             }
@@ -72,13 +74,13 @@ public class Requests {
             String scheduler = "";
             try {
                 scheduler = (hit.getSourceAsMap()).get("pscheduler-tests").toString();
-            }catch (Exception e){
+            } catch (Exception e) {
                 //todo
             }
-            scheduler = scheduler.replace("[","").replace("]","");
+            scheduler = scheduler.replace("[", "").replace("]", "");
             String[] schedulerArr = scheduler.split(",");
             for (String s : schedulerArr) {
-                if(!s.trim().equals("")) {
+                if (!s.trim().equals("")) {
                     schedulers.add(s.trim());
                 }
             }
@@ -104,14 +106,15 @@ public class Requests {
     @GetMapping("/search")
     public Set<Map<String, String>> searchHosts(@RequestParam String key, @RequestParam String groupCommunity, @RequestParam String pSchedulers, @RequestParam String searchTerm, @RequestParam int limit) throws IOException {
         RestHighLevelClient client = initClient();
-        SearchResponse searchResponse = searchResponse(client);
+        SearchResponse searchResponse = searchHostResponse(client, key, groupCommunity, pSchedulers.split(","), searchTerm, limit);
         SearchHit[] searchHits = searchResponse.getHits().getHits();
         Set<Map<String, String>> keys = new HashSet<>();
-//        for (SearchHit hit :
-//                searchHits) {
+        System.out.println(searchHits.length);
+        for (SearchHit hit :
+                searchHits) {
 //            keys.addAll(hit.getSourceAsMap().keySet());
-//
-//        }
+            System.out.println(hit.getSourceAsMap());
+        }
         return keys;
     }
 
@@ -132,16 +135,16 @@ public class Requests {
             try {
 //                System.out.println(hit.getSourceAsMap());
                 service = (hit.getSourceAsMap()).get("service-type").toString();
-                service = service.replace("[","").replace("]","");
-                if(serviceMap.containsKey(service)) {
+                service = service.replace("[", "").replace("]", "");
+                if (serviceMap.containsKey(service)) {
                     serviceMap.get(service).add(hit.getSourceAsMap());
-                }else {
+                } else {
                     List<Map> serviceList = new ArrayList<>();
                     serviceList.add(hit.getSourceAsMap());
 
                     serviceMap.put(service, serviceList);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 //todo
 //                e.printStackTrace();
             }
@@ -149,41 +152,6 @@ public class Requests {
         client.close();
         return serviceMap;
     }
-
-    @GetMapping("/host")
-    public String getHost(@RequestParam String serviceHost) throws IOException {
-        RestHighLevelClient client = initClient();
-        SearchResponse searchResponse = searchHostResponse(client, serviceHost);
-        String scrollId = searchResponse.getScrollId();
-        SearchHits hits = searchResponse.getHits();
-
-
-        Map<String, List<Map>> serviceMap = new TreeMap<>();
-
-        for (SearchHit hit : hits) {
-            System.out.println(hit.getSourceAsMap());
-//            String service = "";
-//            try {
-////                System.out.println(hit.getSourceAsMap());
-//                service = (hit.getSourceAsMap()).get("service-type").toString();
-//                service = service.replace("[","").replace("]","");
-//                if(serviceMap.containsKey(service)) {
-//                    serviceMap.get(service).add(hit.getSourceAsMap());
-//                }else {
-//                    List<Map> serviceList = new ArrayList<>();
-//                    serviceList.add(hit.getSourceAsMap());
-//
-//                    serviceMap.put(service, serviceList);
-//                }
-//            }catch (Exception e){
-//                //todo
-////                e.printStackTrace();
-//            }
-        }
-        client.close();
-        return "{}";
-    }
-
 
     private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
         SearchRequest searchRequest = new SearchRequest("lookup");
@@ -205,20 +173,31 @@ public class Requests {
         return client.search(searchRequest, RequestOptions.DEFAULT);
     }
 
-    private SearchResponse searchHostResponse(RestHighLevelClient client, String term) throws IOException {
+    private SearchResponse searchHostResponse(RestHighLevelClient client, String key, String groupCommunity, String[] pSchedulers, String searchTerm, int limit) throws IOException {
+        BoolQueryBuilder query = QueryBuilders.boolQuery();
         SearchRequest searchRequest = new SearchRequest("lookup");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        searchSourceBuilder.size(10000);
-//        searchSourceBuilder.query(matchQuery());
-        System.out.println(term);
-        searchSourceBuilder.query(termQuery("type.keyword", "host"));
+
+        if(key.length() > 0) {
+            query.must(QueryBuilders.termQuery(key+".keyword", searchTerm));
+        }
+        if(groupCommunity.length() > 0) {
+            query.must(termQuery("group-communities.keyword", groupCommunity));
+        }
+        for (String pScheduler :
+                pSchedulers) {
+            if(pScheduler.length() > 0) {
+              query.must(termQuery("pscheduler-tests.keyword", pScheduler));
+            }
+        }
+        searchSourceBuilder.query(query);
         searchRequest.source(searchSourceBuilder);
         return client.search(searchRequest, RequestOptions.DEFAULT);
     }
 
     private RestHighLevelClient initClient() {
         return new RestHighLevelClient(
-                        RestClient.builder(
-                                new HttpHost("localhost", 9200, "http"), new HttpHost("localhost", 9201, "http")));
+                RestClient.builder(
+                        new HttpHost("localhost", 9200, "http"), new HttpHost("localhost", 9201, "http")));
     }
 }
