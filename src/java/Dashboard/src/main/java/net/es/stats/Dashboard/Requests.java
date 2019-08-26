@@ -19,6 +19,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
+import org.springframework.data.convert.ReadingConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -99,6 +100,21 @@ public class Requests {
         }
         return keys;
     }
+
+    @GetMapping("/search")
+    public Set<Map<String, String>> searchHosts(@RequestParam String key, @RequestParam String groupCommunity, @RequestParam String pSchedulers, @RequestParam String searchTerm, @RequestParam int limit) throws IOException {
+        RestHighLevelClient client = initClient();
+        SearchResponse searchResponse = searchResponse(client);
+        SearchHit[] searchHits = searchResponse.getHits().getHits();
+        Set<Map<String, String>> keys = new HashSet<>();
+//        for (SearchHit hit :
+//                searchHits) {
+//            keys.addAll(hit.getSourceAsMap().keySet());
+//
+//        }
+        return keys;
+    }
+
 
     @GetMapping("/services")
     @ResponseBody
