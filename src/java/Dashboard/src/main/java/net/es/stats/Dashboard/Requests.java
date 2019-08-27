@@ -117,7 +117,8 @@ public class Requests {
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-      //      System.out.println(sourceMap);
+//            System.out.println(sourceMap);
+            String uri = sourceMap.get("uri").toString().replace("[", "").replace("]", "");
       String interfaces =
           sourceMap.get("host-net-interfaces").toString().replace("[", "").replace("]", "");
       SearchResponse interfaceSearchResponse =
@@ -132,11 +133,9 @@ public class Requests {
           sourceMap
               .get("host-name")
               .toString()
-              .replace(", ", "\n")
               .replace("[", "")
               .replace("]", "");
 
-      // todo hardware
       StringBuilder hardware = new StringBuilder();
       String processor = "\n"; // todo processor?
       String memory =
@@ -187,10 +186,26 @@ public class Requests {
       hostMap.put("Toolkit Version", toolkitVersion);
       hostMap.put("Communities", communities);
       hostMap.put("pSchedulers", pschedulerTests);
+      hostMap.put("URI", uri);
       hostMap.put("JSON", sourceMap.toString());
       setMap.add(hostMap);
     }
     return setMap;
+  }
+
+  @GetMapping("/searchService")
+  public Map<String,String> searchService(@RequestParam String hosts) throws IOException {
+    RestHighLevelClient client = initClient();
+    String[] hostArray = hosts.split(",");
+
+    for (String host : hostArray) {
+      SearchResponse searchResponse = searchServiceResponse(client, host);
+      SearchHit[] searchHits = searchResponse.getHits().getHits();
+      for (SearchHit searchHit : searchHits) {
+        System.out.println(searchHit.getSourceAsMap());
+      }
+    }
+    return new HashMap<>();
   }
 
   private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
@@ -240,7 +255,7 @@ public class Requests {
   }
 
   private SearchResponse searchInterfaceResponse(
-      RestHighLevelClient client, String[] pSchedulers, String[] interfaces) throws IOException {
+          RestHighLevelClient client, String[] pSchedulers, String[] interfaces) throws IOException {
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -258,6 +273,19 @@ public class Requests {
     }
 
     query.must(termQuery("type.keyword", "interface"));
+    searchSourceBuilder.query(query);
+    searchRequest.source(searchSourceBuilder);
+    return client.search(searchRequest, RequestOptions.DEFAULT);
+  }
+
+  private SearchResponse searchServiceResponse(
+          RestHighLevelClient client, String host) throws IOException {
+    BoolQueryBuilder query = QueryBuilders.boolQuery();
+    SearchRequest searchRequest = new SearchRequest("lookup");
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+    query.must(termQuery("service-host.keyword", host));
+    query.must(termQuery("type.keyword", "service"));
     searchSourceBuilder.query(query);
     searchRequest.source(searchSourceBuilder);
     return client.search(searchRequest, RequestOptions.DEFAULT);

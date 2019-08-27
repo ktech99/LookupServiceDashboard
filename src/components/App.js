@@ -18,14 +18,16 @@ class App extends Component {
       keys: [],
       chosenKey: "",
       searchTerm: "",
-      hostResults : [],
-      serviceVisibility : true
+      hostResults: [],
+      serviceVisibility: true,
+      chosenHost: ""
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
     this.searchHost = this.searchHost.bind(this);
     this.getHost = this.getHost.bind(this);
     this.chooseHost = this.chooseHost.bind(this);
+    this.searchService = this.searchService.bind(this)
   }
 
   componentDidMount() {
@@ -117,23 +119,23 @@ class App extends Component {
     fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        this.setState({hostResults: data})
+        this.setState({ hostResults: data })
       })
       .catch(console.log)
-      console.log(this.state.hostResults)
+    console.log(this.state.hostResults)
   }
 
-  getHost(props){
+  getHost(props) {
     const hostInformation = props.hostInformation;
     const hostTable = hostInformation.map((host) =>
       <tr key={host["Host Name"]} >
-        <td onClick={() => {this.chooseHost(host["Host Name"])}} >{host["Host Name"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Hardware"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["System Info"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Toolkit Version"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Communities"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["pSchedulers"]}</td>
-        <td><Button variant="warning" onClick={() => {this.showHostJSON({host})}}>View JSON</Button></td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }} >{host["Host Name"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Hardware"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["System Info"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Toolkit Version"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Communities"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["pSchedulers"]}</td>
+        <td><Button variant="warning" onClick={() => { this.showHostJSON({ host }) }}>View JSON</Button></td>
       </tr>
     );
     return (
@@ -143,18 +145,26 @@ class App extends Component {
     );
   }
 
-  chooseHost(hostName){
-    this.setState({serviceVisibility: false});
-    document.getElementById("informationTabs-tab-second").click();
+  chooseHost(hostName) {
+    this.setState({ serviceVisibility: false });
+    this.setState({ chosenHost: hostName }, function () { this.searchService() })
+    // this.searchService()
   }
 
-  showHostJSON(host){
+  showHostJSON(host) {
     console.log(host)
     alert(host["host"]["JSON"])
   }
 
-  searchService(){
-
+  searchService() {
+    console.log(this.state.chosenHost)
+    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      .then(res => res.json())
+      .then((data) => {
+        // this.setState({hostResults: data})
+      })
+      .catch(console.log)
+    document.getElementById("informationTabs-tab-second").click();
   }
 
 
@@ -194,15 +204,15 @@ class App extends Component {
           </div>
         </Jumbotron>
 
-        <Tab.Container id="informationTabs" defaultActiveKey="first" className = "informationTabs">
+        <Tab.Container id="informationTabs" defaultActiveKey="first" className="informationTabs">
           <Row>
             <Col sm={2}>
               <Nav variant="pills" className="flex-column">
-                <Nav.Item id = "hostTab">
+                <Nav.Item id="hostTab">
                   <Nav.Link eventKey="first">Host Information</Nav.Link>
                 </Nav.Item>
                 <Nav.Item id="serviceTab">
-                  <Nav.Link eventKey="second" disabled = {this.state.serviceVisibility} >Service Information</Nav.Link>
+                  <Nav.Link eventKey="second" disabled={this.state.serviceVisibility} >Service Information</Nav.Link>
                 </Nav.Item>
               </Nav>
             </Col>
@@ -221,23 +231,23 @@ class App extends Component {
                         <th>JSON</th>
                       </tr>
                     </thead>
-                    <this.getHost hostInformation = {this.state.hostResults}/>
+                    <this.getHost hostInformation={this.state.hostResults} />
                   </Table>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
-                <Table striped bordered hover variant="dark">
+                  <Table striped bordered hover variant="dark">
                     <thead>
                       <tr>
-                        <th>Host Name</th>
-                        <th>Hardware</th>
-                        <th>System Info</th>
-                        <th>Toolkit-Version</th>
+                        <th>Service Name</th>
+                        <th>Address</th>
+                        <th>geographic Location</th>
                         <th>Communities</th>
+                        <th>Version</th>
+                        <th>Example Command</th>
                       </tr>
                     </thead>
                     {/* <this.getHost hostInformation = {this.state.hostResults}/> */}
                   </Table>
-                  {/* <Sonnet /> */}
                 </Tab.Pane>
               </Tab.Content>
             </Col>
