@@ -132,6 +132,7 @@ class App extends Component {
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["System Info"]}</td>
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Toolkit Version"]}</td>
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Communities"]}</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["pSchedulers"]}</td>
         <td><Button variant="warning" onClick={() => {this.showHostJSON({host})}}>View JSON</Button></td>
       </tr>
     );
@@ -216,6 +217,7 @@ class App extends Component {
                         <th>System Info</th>
                         <th>Toolkit-Version</th>
                         <th>Communities</th>
+                        <th>Pscheduler Tests</th>
                         <th>JSON</th>
                       </tr>
                     </thead>

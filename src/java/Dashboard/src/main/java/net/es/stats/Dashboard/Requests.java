@@ -117,12 +117,16 @@ public class Requests {
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-      System.out.println(sourceMap);
+      //      System.out.println(sourceMap);
       String interfaces =
           sourceMap.get("host-net-interfaces").toString().replace("[", "").replace("]", "");
       SearchResponse interfaceSearchResponse =
           searchInterfaceResponse(client, pSchedulers.split(","), interfaces.split(","));
       SearchHit[] interfaceHits = interfaceSearchResponse.getHits().getHits();
+
+      if (interfaceHits.length == 0) {
+        continue;
+      }
 
       String hostName =
           sourceMap
@@ -139,12 +143,19 @@ public class Requests {
           sourceMap.get("host-hardware-memory").toString().replace("[", "").replace("]", "") + "\n";
       int interfaceCount = 1;
       String interfaceHardware = "";
+      String pschedulerTests = "";
       for (SearchHit interfaceHit : interfaceHits) {
-        //        System.out.println(interfaceHit.getSourceAsMap());
+        //                System.out.println(interfaceHit.getSourceAsMap());
         Map<String, Object> interfaceMap = interfaceHit.getSourceAsMap();
         interfaceHardware = "NIC #" + interfaceCount + " Speed: " + "\n";
         // Todo speed?
-        interfaceHardware += "NIC #" + interfaceCount + " MTU: " + interfaceMap.get("interface-mtu");
+        interfaceHardware +=
+            "NIC #" + interfaceCount + " MTU: " + interfaceMap.get("interface-mtu");
+        try {
+          pschedulerTests = interfaceMap.get("pscheduler-tests").toString();
+        } catch (Exception e) {
+//          e.printStackTrace();
+        }
         interfaceCount++;
       }
       hardware.append(processor);
@@ -175,6 +186,7 @@ public class Requests {
       hostMap.put("System Info", systemInfo.toString());
       hostMap.put("Toolkit Version", toolkitVersion);
       hostMap.put("Communities", communities);
+      hostMap.put("pSchedulers", pschedulerTests);
       hostMap.put("JSON", sourceMap.toString());
       setMap.add(hostMap);
     }
@@ -214,7 +226,7 @@ public class Requests {
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-    if (key.length() > 0) {
+    if (key.length() > 0 && !key.equals(" ")) {
       query.must(termQuery(key + ".keyword", searchTerm));
     }
     if (groupCommunity.length() > 0) {
