@@ -117,7 +117,7 @@ public class Requests {
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-      System.out.println(sourceMap);
+//      System.out.println(sourceMap);
       String hostName =
           sourceMap
               .get("host-name")
@@ -144,7 +144,6 @@ public class Requests {
       String communities = sourceMap
               .get("group-communities")
               .toString()
-//              .replace(", ", "\n")
               .replace("[", "")
               .replace("]", "");
 
@@ -153,6 +152,7 @@ public class Requests {
       hostMap.put("System Info", systemInfo.toString());
       hostMap.put("Toolkit Version", toolkitVersion);
       hostMap.put("Communities", communities);
+      hostMap.put("JSON", sourceMap.toString());
       setMap.add(hostMap);
     }
     return setMap;

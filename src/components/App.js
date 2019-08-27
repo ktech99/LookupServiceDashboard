@@ -126,12 +126,13 @@ class App extends Component {
   getHost(props){
     const hostInformation = props.hostInformation;
     const hostTable = hostInformation.map((host) =>
-      <tr key={host["Host Name"]} onClick={() => {this.chooseHost(host["Host Name"])}}>
-        <td>{host["Host Name"]}</td>
-        <td>Hardware</td>
-        <td>{host["System Info"]}</td>
-        <td>{host["Toolkit Version"]}</td>
-        <td>{host["Communities"]}</td>
+      <tr key={host["Host Name"]} >
+        <td onClick={() => {this.chooseHost(host["Host Name"])}} >{host["Host Name"]}</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>Hardware</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["System Info"]}</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Toolkit Version"]}</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Communities"]}</td>
+        <td><Button variant="warning" onClick={() => {this.showHostJSON({host})}}>View JSON</Button></td>
       </tr>
     );
     return (
@@ -144,6 +145,15 @@ class App extends Component {
   chooseHost(hostName){
     this.setState({serviceVisibility: false});
     document.getElementById("informationTabs-tab-second").click();
+  }
+
+  showHostJSON(host){
+    console.log(host)
+    alert(host["host"]["JSON"])
+  }
+
+  searchService(){
+
   }
 
 
@@ -206,12 +216,25 @@ class App extends Component {
                         <th>System Info</th>
                         <th>Toolkit-Version</th>
                         <th>Communities</th>
+                        <th>JSON</th>
                       </tr>
                     </thead>
                     <this.getHost hostInformation = {this.state.hostResults}/>
                   </Table>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
+                <Table striped bordered hover variant="dark">
+                    <thead>
+                      <tr>
+                        <th>Host Name</th>
+                        <th>Hardware</th>
+                        <th>System Info</th>
+                        <th>Toolkit-Version</th>
+                        <th>Communities</th>
+                      </tr>
+                    </thead>
+                    {/* <this.getHost hostInformation = {this.state.hostResults}/> */}
+                  </Table>
                   {/* <Sonnet /> */}
                 </Tab.Pane>
               </Tab.Content>
