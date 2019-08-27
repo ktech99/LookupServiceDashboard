@@ -128,7 +128,7 @@ class App extends Component {
     const hostTable = hostInformation.map((host) =>
       <tr key={host["Host Name"]} >
         <td onClick={() => {this.chooseHost(host["Host Name"])}} >{host["Host Name"]}</td>
-        <td onClick={() => {this.chooseHost(host["Host Name"])}}>Hardware</td>
+        <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Hardware"]}</td>
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["System Info"]}</td>
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Toolkit Version"]}</td>
         <td onClick={() => {this.chooseHost(host["Host Name"])}}>{host["Communities"]}</td>

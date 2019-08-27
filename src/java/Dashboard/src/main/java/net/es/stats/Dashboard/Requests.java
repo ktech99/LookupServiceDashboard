@@ -113,11 +113,17 @@ public class Requests {
         searchHostResponse(client, key, groupCommunity, pSchedulers.split(","), searchTerm, limit);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
 
-    Set<Map<String,String>> setMap = new HashSet<>();
+    Set<Map<String, String>> setMap = new HashSet<>();
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-//      System.out.println(sourceMap);
+      System.out.println(sourceMap);
+      String interfaces =
+          sourceMap.get("host-net-interfaces").toString().replace("[", "").replace("]", "");
+      SearchResponse interfaceSearchResponse =
+          searchInterfaceResponse(client, pSchedulers.split(","), interfaces.split(","));
+      SearchHit[] interfaceHits = interfaceSearchResponse.getHits().getHits();
+
       String hostName =
           sourceMap
               .get("host-name")
@@ -126,7 +132,26 @@ public class Requests {
               .replace("[", "")
               .replace("]", "");
 
-      //todo hardware
+      // todo hardware
+      StringBuilder hardware = new StringBuilder();
+      String processor = "\n"; // todo processor?
+      String memory =
+          sourceMap.get("host-hardware-memory").toString().replace("[", "").replace("]", "") + "\n";
+      int interfaceCount = 1;
+      String interfaceHardware = "";
+      for (SearchHit interfaceHit : interfaceHits) {
+        //        System.out.println(interfaceHit.getSourceAsMap());
+        Map<String, Object> interfaceMap = interfaceHit.getSourceAsMap();
+        interfaceHardware = "NIC #" + interfaceCount + " Speed: " + "\n";
+        // Todo speed?
+        interfaceHardware += "NIC #" + interfaceCount + " MTU: " + interfaceMap.get("interface-mtu");
+        interfaceCount++;
+      }
+      hardware.append(processor);
+      hardware.append("Memory: ");
+      hardware.append(memory);
+      hardware.append(interfaceHardware);
+
       StringBuilder systemInfo = new StringBuilder();
       String osName = sourceMap.get("host-os-name").toString().replace("[", "").replace("]", "");
       String osKernel =
@@ -136,19 +161,17 @@ public class Requests {
       systemInfo.append("\n");
       systemInfo.append("Kernal: ");
       systemInfo.append(osKernel);
-      //todo contact
+      // todo contact
 
       String toolkitVersion =
           sourceMap.get("pshost-toolkitversion").toString().replace("[", "").replace("]", "");
 
-      String communities = sourceMap
-              .get("group-communities")
-              .toString()
-              .replace("[", "")
-              .replace("]", "");
+      String communities =
+          sourceMap.get("group-communities").toString().replace("[", "").replace("]", "");
 
       Map<String, String> hostMap = new TreeMap<>();
       hostMap.put("Host Name", hostName);
+      hostMap.put("Hardware", hardware.toString());
       hostMap.put("System Info", systemInfo.toString());
       hostMap.put("Toolkit Version", toolkitVersion);
       hostMap.put("Communities", communities);
@@ -197,12 +220,32 @@ public class Requests {
     if (groupCommunity.length() > 0) {
       query.must(termQuery("group-communities.keyword", groupCommunity));
     }
+
+    query.must(termQuery("type.keyword", "host"));
+    searchSourceBuilder.query(query);
+    searchRequest.source(searchSourceBuilder);
+    return client.search(searchRequest, RequestOptions.DEFAULT);
+  }
+
+  private SearchResponse searchInterfaceResponse(
+      RestHighLevelClient client, String[] pSchedulers, String[] interfaces) throws IOException {
+    BoolQueryBuilder query = QueryBuilders.boolQuery();
+    SearchRequest searchRequest = new SearchRequest("lookup");
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
     for (String pScheduler : pSchedulers) {
       if (pScheduler.length() > 0) {
         query.must(termQuery("pscheduler-tests.keyword", pScheduler));
       }
     }
-    query.must(termQuery("type.keyword", "host"));
+
+    for (String interfaceURI : interfaces) {
+      if (interfaceURI.length() > 0) {
+        query.must(termQuery("uri.keyword", interfaceURI));
+      }
+    }
+
+    query.must(termQuery("type.keyword", "interface"));
     searchSourceBuilder.query(query);
     searchRequest.source(searchSourceBuilder);
     return client.search(searchRequest, RequestOptions.DEFAULT);
