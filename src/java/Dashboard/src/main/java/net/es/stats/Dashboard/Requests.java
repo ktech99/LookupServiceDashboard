@@ -144,7 +144,7 @@ public class Requests {
       String communities = sourceMap
               .get("group-communities")
               .toString()
-              .replace(", ", "\n")
+//              .replace(", ", "\n")
               .replace("[", "")
               .replace("]", "");
 

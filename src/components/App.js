@@ -4,6 +4,7 @@ import logo from "../image/Logo.png";
 import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar, Table, Tab, Row, Col, Nav } from 'react-bootstrap'
 import Search from "react-search"
 import { thisExpression } from '@babel/types';
+import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
 
 class App extends Component {
 
@@ -16,11 +17,15 @@ class App extends Component {
       chosenSchedulers: [],
       keys: [],
       chosenKey: "",
-      searchTerm: ""
+      searchTerm: "",
+      hostResults : [],
+      serviceVisibility : true
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
     this.searchHost = this.searchHost.bind(this);
+    this.getHost = this.getHost.bind(this);
+    this.chooseHost = this.chooseHost.bind(this);
   }
 
   componentDidMount() {
@@ -112,9 +117,33 @@ class App extends Component {
     fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        console.log(data);
+        this.setState({hostResults: data})
       })
       .catch(console.log)
+      console.log(this.state.hostResults)
+  }
+
+  getHost(props){
+    const hostInformation = props.hostInformation;
+    const hostTable = hostInformation.map((host) =>
+      <tr key={host["Host Name"]} onClick={() => {this.chooseHost(host["Host Name"])}}>
+        <td>{host["Host Name"]}</td>
+        <td>Hardware</td>
+        <td>{host["System Info"]}</td>
+        <td>{host["Toolkit Version"]}</td>
+        <td>{host["Communities"]}</td>
+      </tr>
+    );
+    return (
+      <tbody>
+        {hostTable}
+      </tbody>
+    );
+  }
+
+  chooseHost(hostName){
+    this.setState({serviceVisibility: false});
+    document.getElementById("informationTabs-tab-second").click();
   }
 
 
@@ -158,11 +187,11 @@ class App extends Component {
           <Row>
             <Col sm={2}>
               <Nav variant="pills" className="flex-column">
-                <Nav.Item>
+                <Nav.Item id = "hostTab">
                   <Nav.Link eventKey="first">Host Information</Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="second" disabled>Service Information</Nav.Link>
+                <Nav.Item id="serviceTab">
+                  <Nav.Link eventKey="second" disabled = {this.state.serviceVisibility} >Service Information</Nav.Link>
                 </Nav.Item>
               </Nav>
             </Col>
@@ -179,21 +208,7 @@ class App extends Component {
                         <th>Communities</th>
                       </tr>
                     </thead>
-                    <tbody>
-                      <tr>
-                        <td>1</td>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                        <td>ebbo</td>
-                      </tr>
-                      <tr>
-                        <td>2</td>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                      </tr>
-                    </tbody>
+                    <this.getHost hostInformation = {this.state.hostResults}/>
                   </Table>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
