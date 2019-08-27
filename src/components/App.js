@@ -112,8 +112,7 @@ class App extends Component {
     fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        // data = data.map(value => ({ id : 1, value: value }))      
-        // this.setState({keys: data })
+        console.log(data);
       })
       .catch(console.log)
   }

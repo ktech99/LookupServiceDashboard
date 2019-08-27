@@ -1,5 +1,6 @@
 package net.es.stats.Dashboard;
 
+import ch.qos.logback.core.util.SystemInfo;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -100,7 +101,7 @@ public class Requests {
   }
 
   @GetMapping("/search")
-  public Map<String, Set<String>> searchHosts(
+  public Set<Map<String, String>> searchHosts(
       @RequestParam String key,
       @RequestParam String groupCommunity,
       @RequestParam String pSchedulers,
@@ -111,7 +112,9 @@ public class Requests {
     SearchResponse searchResponse =
         searchHostResponse(client, key, groupCommunity, pSchedulers.split(","), searchTerm, limit);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
-    Map<String, Set<String>> hostMap = new TreeMap<>();
+
+    Set<Map<String,String>> setMap = new HashSet<>();
+
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
       System.out.println(sourceMap);
@@ -123,8 +126,36 @@ public class Requests {
               .replace("[", "")
               .replace("]", "");
 
+      //todo hardware
+      StringBuilder systemInfo = new StringBuilder();
+      String osName = sourceMap.get("host-os-name").toString().replace("[", "").replace("]", "");
+      String osKernel =
+          sourceMap.get("host-os-kernel").toString().replace("[", "").replace("]", "");
+      systemInfo.append("Operating System: ");
+      systemInfo.append(osName);
+      systemInfo.append("\n");
+      systemInfo.append("Kernal: ");
+      systemInfo.append(osKernel);
+      //todo contact
+
+      String toolkitVersion =
+          sourceMap.get("pshost-toolkitversion").toString().replace("[", "").replace("]", "");
+
+      String communities = sourceMap
+              .get("group-communities")
+              .toString()
+              .replace(", ", "\n")
+              .replace("[", "")
+              .replace("]", "");
+
+      Map<String, String> hostMap = new TreeMap<>();
+      hostMap.put("Host Name", hostName);
+      hostMap.put("System Info", systemInfo.toString());
+      hostMap.put("Toolkit Version", toolkitVersion);
+      hostMap.put("Communities", communities);
+      setMap.add(hostMap);
     }
-    return hostMap;
+    return setMap;
   }
 
   private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
@@ -161,7 +192,7 @@ public class Requests {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
     if (key.length() > 0) {
-      query.must(QueryBuilders.termQuery(key + ".keyword", searchTerm));
+      query.must(termQuery(key + ".keyword", searchTerm));
     }
     if (groupCommunity.length() > 0) {
       query.must(termQuery("group-communities.keyword", groupCommunity));
