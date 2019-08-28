@@ -5,6 +5,7 @@ import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar, Table, Tab, Row,
 import Search from "react-search"
 import { thisExpression } from '@babel/types';
 import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
+import MapContainer from './MapContainer'
 
 class App extends Component {
 
@@ -23,7 +24,8 @@ class App extends Component {
       chosenHost: "",
       serviceResults: [],
       chosenLat: "",
-      chosenLong: ""
+      chosenLong: "",
+      showMap: true
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
@@ -282,7 +284,9 @@ class App extends Component {
             </Col>
           </Row>
         </Tab.Container>
-
+        
+        {/* <DoctorsMap></DoctorsMap> */}
+        {(this.state.showMap) ? <MapContainer loc = {this.state.showMap}></MapContainer>: ''}
       </div>
     );
   }
