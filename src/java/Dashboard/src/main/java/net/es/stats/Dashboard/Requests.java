@@ -2,6 +2,7 @@ package net.es.stats.Dashboard;
 
 import ch.qos.logback.core.util.SystemInfo;
 import org.apache.http.HttpHost;
+import org.apache.lucene.analysis.LowerCaseFilter;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -12,6 +13,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RequestOptions;
 
 import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -30,8 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.*;
 
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.termQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 @RestController
 public class Requests {
@@ -117,8 +118,8 @@ public class Requests {
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-//            System.out.println(sourceMap);
-            String uri = sourceMap.get("uri").toString().replace("[", "").replace("]", "");
+      //            System.out.println(sourceMap);
+      String uri = sourceMap.get("uri").toString().replace("[", "").replace("]", "");
       String interfaces =
           sourceMap.get("host-net-interfaces").toString().replace("[", "").replace("]", "");
       SearchResponse interfaceSearchResponse =
@@ -129,12 +130,7 @@ public class Requests {
         continue;
       }
 
-      String hostName =
-          sourceMap
-              .get("host-name")
-              .toString()
-              .replace("[", "")
-              .replace("]", "");
+      String hostName = sourceMap.get("host-name").toString().replace("[", "").replace("]", "");
 
       StringBuilder hardware = new StringBuilder();
       String processor = "\n"; // todo processor?
@@ -153,7 +149,7 @@ public class Requests {
         try {
           pschedulerTests = interfaceMap.get("pscheduler-tests").toString();
         } catch (Exception e) {
-//          e.printStackTrace();
+          //          e.printStackTrace();
         }
         interfaceCount++;
       }
@@ -163,9 +159,8 @@ public class Requests {
       hardware.append(interfaceHardware);
 
       StringBuilder systemInfo = new StringBuilder();
-      String osName = sourceMap.get("host-os-name").toString().replace("[", "").replace("]", "");
-      String osKernel =
-          sourceMap.get("host-os-kernel").toString().replace("[", "").replace("]", "");
+      String osName = tryGet(sourceMap, "host-os-name");
+      String osKernel = tryGet(sourceMap, "host-os-kernal");
       systemInfo.append("Operating System: ");
       systemInfo.append(osName);
       systemInfo.append("\n");
@@ -173,11 +168,10 @@ public class Requests {
       systemInfo.append(osKernel);
       // todo contact
 
-      String toolkitVersion =
-          sourceMap.get("pshost-toolkitversion").toString().replace("[", "").replace("]", "");
-
-      String communities =
-          sourceMap.get("group-communities").toString().replace("[", "").replace("]", "");
+      String toolkitVersion = tryGet(sourceMap, "pshost-toolkitversion");
+      String communities = tryGet(sourceMap, "group-communities");
+      String longitude = tryGet(sourceMap, "location-longitude");
+      String latitude = tryGet(sourceMap, "location-latitude");
 
       Map<String, String> hostMap = new TreeMap<>();
       hostMap.put("Host Name", hostName);
@@ -188,6 +182,8 @@ public class Requests {
       hostMap.put("pSchedulers", pschedulerTests);
       hostMap.put("URI", uri);
       hostMap.put("JSON", sourceMap.toString());
+      hostMap.put("latitude", latitude);
+      hostMap.put("longitude", longitude);
       setMap.add(hostMap);
     }
     client.close();
@@ -195,33 +191,37 @@ public class Requests {
   }
 
   @GetMapping("/searchService")
-  public Set<Map<String,String>> searchService(@RequestParam String hosts) throws IOException {
+  public Set<Map<String, String>> searchService(@RequestParam String hosts) throws IOException {
     RestHighLevelClient client = initClient();
     String[] hostArray = hosts.split(",");
 
     Set<Map<String, String>> mapSet = new HashSet<>();
 
     for (String host : hostArray) {
-      Map<String,String> serviceMap = new HashMap<>();
+      Map<String, String> serviceMap = new HashMap<>();
       SearchResponse searchResponse = searchServiceResponse(client, host);
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
+        System.out.println(searchMap);
         String name = tryGet(searchMap, "service-name");
-        String address = ""; //todo address
-        String location = ""; //todo location
+        String address = ""; // todo address
+        String location = ""; // todo location
         String communities = tryGet(searchMap, "group-communities");
         String version = tryGet(searchMap, "service-version");
-        String command = ""; //todo command
+        String command = ""; // todo command
+        String serviceType = tryGet(searchMap, "service-type");
         serviceMap.put("name", name);
         serviceMap.put("address", address);
         serviceMap.put("location", location);
         serviceMap.put("communities", communities);
         serviceMap.put("version", version);
         serviceMap.put("command", command);
+        serviceMap.put("type", serviceType);
         serviceMap.put("JSON", searchMap.toString());
+        mapSet.add(serviceMap);
       }
-      mapSet.add(serviceMap);
+
     }
     client.close();
     return mapSet;
@@ -249,18 +249,14 @@ public class Requests {
   }
 
   private SearchResponse searchHostResponse(
-      RestHighLevelClient client,
-      String key,
-      String groupCommunity,
-      String searchTerm,
-      int limit)
+      RestHighLevelClient client, String key, String groupCommunity, String searchTerm, int limit)
       throws IOException {
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     searchSourceBuilder.size(limit);
     if (key.length() > 0 && !key.equals(" ")) {
-      query.must(termQuery(key + ".keyword", searchTerm));
+      query.must(regexpQuery(key + ".keyword", searchTerm + ".*"));
     }
     if (groupCommunity.length() > 0) {
       query.must(termQuery("group-communities.keyword", groupCommunity));
@@ -273,7 +269,7 @@ public class Requests {
   }
 
   private SearchResponse searchInterfaceResponse(
-          RestHighLevelClient client, String[] pSchedulers, String[] interfaces) throws IOException {
+      RestHighLevelClient client, String[] pSchedulers, String[] interfaces) throws IOException {
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -296,8 +292,8 @@ public class Requests {
     return client.search(searchRequest, RequestOptions.DEFAULT);
   }
 
-  private SearchResponse searchServiceResponse(
-          RestHighLevelClient client, String host) throws IOException {
+  private SearchResponse searchServiceResponse(RestHighLevelClient client, String host)
+      throws IOException {
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -309,10 +305,10 @@ public class Requests {
     return client.search(searchRequest, RequestOptions.DEFAULT);
   }
 
-  private String tryGet(Map<String, Object> map, String toGet){
-    try{
+  private String tryGet(Map<String, Object> map, String toGet) {
+    try {
       return map.get(toGet).toString().replace("[", "").replace("]", "");
-    }catch (Exception e){
+    } catch (Exception e) {
       return "";
     }
   }

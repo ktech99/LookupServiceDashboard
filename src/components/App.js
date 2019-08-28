@@ -21,7 +21,9 @@ class App extends Component {
       hostResults: [],
       serviceVisibility: true,
       chosenHost: "",
-      serviceResults: []
+      serviceResults: [],
+      chosenLat: "",
+      chosenLong: ""
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
@@ -133,12 +135,12 @@ class App extends Component {
     const hostInformation = props.hostInformation;
     const hostTable = hostInformation.map((host) =>
       <tr key={host["Host Name"]} >
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Host Name"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Hardware"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["System Info"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Toolkit Version"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Communities"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["pSchedulers"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Host Name"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Hardware"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["System Info"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Toolkit Version"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Communities"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["pSchedulers"]}</td>
         <td><Button variant="warning" onClick={() => { this.showHostJSON({ host }) }}>View JSON</Button></td>
       </tr>
     );
@@ -149,9 +151,9 @@ class App extends Component {
     );
   }
 
-  chooseHost(hostName) {
+  chooseHost(hostName, latitude, longitude) {
     this.setState({ serviceVisibility: false });
-    this.setState({ chosenHost: hostName }, function () { this.searchService() })
+    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService() })
     // this.searchService()
   }
 
@@ -176,9 +178,9 @@ class App extends Component {
     console.log(serviceInformation)
     const serviceTable = serviceInformation.map((service) =>
       <tr key={service["name"]} >
-        <td>{service["name"]}</td>
+        <td>{service["name"]} - {service["type"]}</td>
         <td>{service["address"]}</td>
-        <td>{service["location"]}</td>
+        <td>{this.state.chosenLat} , {this.state.chosenLong}</td>
         <td>{service["communities"]}</td>
         <td>{service["version"]}</td>
         <td>{service["command"]}</td>
@@ -207,8 +209,6 @@ class App extends Component {
               maxSelected={1}
               multiple={true}
               onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
-
-            {/* <input type="text" placeholder="Field Name.." className="searchBarField" /> */}
             <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
           </div>
           <div className="dropdownDiv">
@@ -264,7 +264,7 @@ class App extends Component {
                   </Table>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
-                  <Table striped bordered hover variant="dark">
+                  <Table striped bordered hover variant="dark" >
                     <thead>
                       <tr>
                         <th>Service Name</th>
@@ -276,7 +276,7 @@ class App extends Component {
                         <th>JSON</th>
                       </tr>
                     </thead>
-                    <this.getService serviceInformation={this.state.serviceResults} />
+                    <this.getService serviceInformation={this.state.serviceResults}/>
                   </Table>
                 </Tab.Pane>
               </Tab.Content>
