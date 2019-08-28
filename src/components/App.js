@@ -20,7 +20,8 @@ class App extends Component {
       searchTerm: "",
       hostResults: [],
       serviceVisibility: true,
-      chosenHost: ""
+      chosenHost: "",
+      serviceResults: []
     }
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
@@ -28,6 +29,7 @@ class App extends Component {
     this.getHost = this.getHost.bind(this);
     this.chooseHost = this.chooseHost.bind(this);
     this.searchService = this.searchService.bind(this)
+    this.getService = this.getService.bind(this);
   }
 
   componentDidMount() {
@@ -122,14 +124,16 @@ class App extends Component {
         this.setState({ hostResults: data })
       })
       .catch(console.log)
-    console.log(this.state.hostResults)
+      this.setState({ serviceVisibility: true });
+      document.getElementById("informationTabs-tab-first").click();
+    // console.log(this.state.hostResults)
   }
 
   getHost(props) {
     const hostInformation = props.hostInformation;
     const hostTable = hostInformation.map((host) =>
       <tr key={host["Host Name"]} >
-        <td onClick={() => { this.chooseHost(host["URI"]) }} >{host["Host Name"]}</td>
+        <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Host Name"]}</td>
         <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Hardware"]}</td>
         <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["System Info"]}</td>
         <td onClick={() => { this.chooseHost(host["URI"]) }}>{host["Toolkit Version"]}</td>
@@ -161,12 +165,37 @@ class App extends Component {
     fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        // this.setState({hostResults: data})
+        this.setState({ serviceResults: data })
       })
       .catch(console.log)
     document.getElementById("informationTabs-tab-second").click();
   }
 
+  getService(props) {
+    const serviceInformation = props.serviceInformation;
+    console.log(serviceInformation)
+    const serviceTable = serviceInformation.map((service) =>
+      <tr key={service["name"]} >
+        <td>{service["name"]}</td>
+        <td>{service["address"]}</td>
+        <td>{service["location"]}</td>
+        <td>{service["communities"]}</td>
+        <td>{service["version"]}</td>
+        <td>{service["command"]}</td>
+        <td><Button variant="warning" onClick={() => { this.showServiceJSON({ service }) }}>View JSON</Button></td>
+      </tr>
+    );
+    return (
+      <tbody>
+        {serviceTable}
+      </tbody>
+    );
+  }
+
+  showServiceJSON(host) {
+    console.log(host)
+    alert(host["service"]["JSON"])
+  }
 
   render() {
     return (
@@ -244,9 +273,10 @@ class App extends Component {
                         <th>Communities</th>
                         <th>Version</th>
                         <th>Example Command</th>
+                        <th>JSON</th>
                       </tr>
                     </thead>
-                    {/* <this.getHost hostInformation = {this.state.hostResults}/> */}
+                    <this.getService serviceInformation={this.state.serviceResults} />
                   </Table>
                 </Tab.Pane>
               </Tab.Content>

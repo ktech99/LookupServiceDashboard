@@ -194,18 +194,35 @@ public class Requests {
   }
 
   @GetMapping("/searchService")
-  public Map<String,String> searchService(@RequestParam String hosts) throws IOException {
+  public Set<Map<String,String>> searchService(@RequestParam String hosts) throws IOException {
     RestHighLevelClient client = initClient();
     String[] hostArray = hosts.split(",");
 
+    Set<Map<String, String>> mapSet = new HashSet<>();
+
     for (String host : hostArray) {
+      Map<String,String> serviceMap = new HashMap<>();
       SearchResponse searchResponse = searchServiceResponse(client, host);
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
-        System.out.println(searchHit.getSourceAsMap());
+        Map<String, Object> searchMap = searchHit.getSourceAsMap();
+        String name = tryGet(searchMap, "service-name");
+        String address = ""; //todo address
+        String location = ""; //todo location
+        String communities = tryGet(searchMap, "group-communities");
+        String version = tryGet(searchMap, "service-version");
+        String command = ""; //todo command
+        serviceMap.put("name", name);
+        serviceMap.put("address", address);
+        serviceMap.put("location", location);
+        serviceMap.put("communities", communities);
+        serviceMap.put("version", version);
+        serviceMap.put("command", command);
+        serviceMap.put("JSON", searchMap.toString());
       }
+      mapSet.add(serviceMap);
     }
-    return new HashMap<>();
+    return mapSet;
   }
 
   private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
@@ -289,6 +306,14 @@ public class Requests {
     searchSourceBuilder.query(query);
     searchRequest.source(searchSourceBuilder);
     return client.search(searchRequest, RequestOptions.DEFAULT);
+  }
+
+  private String tryGet(Map<String, Object> map, String toGet){
+    try{
+      return map.get(toGet).toString().replace("[", "").replace("]", "");
+    }catch (Exception e){
+      return "";
+    }
   }
 
   private RestHighLevelClient initClient() {
