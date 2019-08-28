@@ -110,7 +110,7 @@ public class Requests {
       throws IOException {
     RestHighLevelClient client = initClient();
     SearchResponse searchResponse =
-        searchHostResponse(client, key, groupCommunity, pSchedulers.split(","), searchTerm, limit);
+        searchHostResponse(client, key, groupCommunity, searchTerm, limit);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
 
     Set<Map<String, String>> setMap = new HashSet<>();
@@ -190,6 +190,7 @@ public class Requests {
       hostMap.put("JSON", sourceMap.toString());
       setMap.add(hostMap);
     }
+    client.close();
     return setMap;
   }
 
@@ -222,6 +223,7 @@ public class Requests {
       }
       mapSet.add(serviceMap);
     }
+    client.close();
     return mapSet;
   }
 
@@ -250,14 +252,13 @@ public class Requests {
       RestHighLevelClient client,
       String key,
       String groupCommunity,
-      String[] pSchedulers,
       String searchTerm,
       int limit)
       throws IOException {
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-
+    searchSourceBuilder.size(limit);
     if (key.length() > 0 && !key.equals(" ")) {
       query.must(termQuery(key + ".keyword", searchTerm));
     }
