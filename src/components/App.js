@@ -5,9 +5,36 @@ import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar, Table, Tab, Row,
 import Search from "react-search"
 import { thisExpression } from '@babel/types';
 import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
-import MapContainer from './MapContainer'
+import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
+import Mark from "./Mark";
+
+// import Map from "./Map"
+
+const Map = withScriptjs(withGoogleMap((props) => {
+
+  //   const markers = props.doctors.map( doctor => <DoctorMarker
+  //                     key={doctor.uid}
+  //                     doctor={doctor}
+  //                     location={{lat: doctor.closestPractice.lat, lng: doctor.closestPractice.lon}}
+  //                   />);
+  console.log(props)
+  return (
+    <GoogleMap
+      defaultZoom={14}
+      center={{ lat: 42.3601, lng: -71.0589 }}
+    >
+      <Mark
+        key={1}
+        doctor={2}
+        location={{ lat: 42.3601, lng: -71.0589 }}
+      />
+    </GoogleMap>
+  );
+}
+))
 
 class App extends Component {
+
 
   constructor() {
     super();
@@ -25,8 +52,9 @@ class App extends Component {
       serviceResults: [],
       chosenLat: "",
       chosenLong: "",
-      showMap: true
+      showMap: true,
     }
+
     this.getCommunities = this.getCommunities.bind(this);
     this.getPschedulers = this.getPschedulers.bind(this);
     this.searchHost = this.searchHost.bind(this);
@@ -128,8 +156,8 @@ class App extends Component {
         this.setState({ hostResults: data })
       })
       .catch(console.log)
-      this.setState({ serviceVisibility: true });
-      document.getElementById("informationTabs-tab-first").click();
+    this.setState({ serviceVisibility: true });
+    document.getElementById("informationTabs-tab-first").click();
     // console.log(this.state.hostResults)
   }
 
@@ -171,7 +199,7 @@ class App extends Component {
         this.setState({ serviceResults: data })
       })
       .catch(console.log)
-      console.log(this.state.serviceResults)
+    console.log(this.state.serviceResults)
     document.getElementById("informationTabs-tab-second").click();
   }
 
@@ -277,16 +305,21 @@ class App extends Component {
                         <th>JSON</th>
                       </tr>
                     </thead>
-                    <this.getService serviceInformation={this.state.serviceResults}/>
+                    <this.getService serviceInformation={this.state.serviceResults} />
                   </Table>
                 </Tab.Pane>
               </Tab.Content>
             </Col>
           </Row>
         </Tab.Container>
-        
-        {/* <DoctorsMap></DoctorsMap> */}
-        {(this.state.showMap) ? <MapContainer loc = {this.state.showMap}></MapContainer>: ''}
+        <Map
+          points={this.state.chosenLat}
+          googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
+          loadingElement={<div style={{ height: `100%` }} />}
+          containerElement={<div style={{ height: `600px`, width: `100vh` }} />}
+          mapElement={<div style={{ height: `100%` }} />}
+        />
+        {/* {(this.state.showMap) ? <MapContainer lat = {this.state.chosenLat} long = {this.state.chosenLong}></MapContainer>: ''} */}
       </div>
     );
   }
