@@ -163,21 +163,20 @@ class App extends Component {
   }
 
   searchService() {
-    console.log(this.state.chosenHost)
     fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ serviceResults: data })
       })
       .catch(console.log)
+      console.log(this.state.serviceResults)
     document.getElementById("informationTabs-tab-second").click();
   }
 
   getService(props) {
     const serviceInformation = props.serviceInformation;
-    console.log(serviceInformation)
     const serviceTable = serviceInformation.map((service) =>
-      <tr key={service["name"]} >
+      <tr key={Math.random()} >
         <td>{service["name"]} - {service["type"]}</td>
         <td>{service["address"]}</td>
         <td>{this.state.chosenLat} , {this.state.chosenLong}</td>
