@@ -21,12 +21,12 @@ const Map = withScriptjs(withGoogleMap((props) => {
   return (
     <GoogleMap
       defaultZoom={14}
-      center={{ lat: 42.3601, lng: -71.0589 }}
+      center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
     >
       <Mark
         key={1}
         doctor={2}
-        location={{ lat: 42.3601, lng: -71.0589 }}
+        location={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
       />
     </GoogleMap>
   );
@@ -50,8 +50,8 @@ class App extends Component {
       serviceVisibility: true,
       chosenHost: "",
       serviceResults: [],
-      chosenLat: "",
-      chosenLong: "",
+      chosenLat: 0,
+      chosenLong: 0,
       showMap: true,
     }
 
@@ -313,7 +313,8 @@ class App extends Component {
           </Row>
         </Tab.Container>
         <Map
-          points={this.state.chosenLat}
+          lat={this.state.chosenLat}
+          long = {this.state.chosenLong}
           googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
           loadingElement={<div style={{ height: `100%` }} />}
           containerElement={<div style={{ height: `600px`, width: `100vh` }} />}
