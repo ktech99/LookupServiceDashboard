@@ -13,14 +13,22 @@ import dot from "../image/dot.png"
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
-  const markers = props.all.map(coord => <Mark
+  console.log(props.hostResults.length)
+
+  const markers = (props.hostResults.length === 0 ? props.all.map(coord => <Mark
     key={Math.random()}
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
     icon={dot}
-  />);
+  />)
+  : 
+  props.hostResults.map(coord => <Mark
+    key={Math.random()}
+    location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
+    icon={dot}
+  />));
   return (
     <GoogleMap
-      defaultZoom={14}
+      defaultZoom={10}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
       
     >
@@ -326,6 +334,7 @@ class App extends Component {
             lat={this.state.chosenLat}
             long={this.state.chosenLong}
             all={this.state.allCoordinates}
+            hostResults={this.state.hostResults}
             googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
             loadingElement={<div style={{ height: `100%` }} />}
             containerElement={<div style={{ height: `600px`, width: `100%` }} />}
