@@ -12,22 +12,23 @@ import Mark from "./Mark";
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
-  //   const markers = props.doctors.map( doctor => <DoctorMarker
-  //                     key={doctor.uid}
-  //                     doctor={doctor}
-  //                     location={{lat: doctor.closestPractice.lat, lng: doctor.closestPractice.lon}}
-  //                   />);
+    const markers = props.all.map( coord => <Mark
+                      key= {Math.random()}
+                      location={{lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude)}}
+                    
+                    />);
   console.log(props)
   return (
     <GoogleMap
       defaultZoom={14}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
     >
-      <Mark
+      {/* <Mark
         key={1}
         doctor={2}
         location={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
-      />
+      /> */}
+      {markers}
     </GoogleMap>
   );
 }
@@ -53,6 +54,7 @@ class App extends Component {
       chosenLat: 0,
       chosenLong: 0,
       showMap: true,
+      allCoordinates: []
     }
 
     this.getCommunities = this.getCommunities.bind(this);
@@ -85,6 +87,13 @@ class App extends Component {
       .then(res => res.json())
       .then((data) => {
         this.setState({ pSchedulerTests: data })
+      })
+      .catch(console.log)
+
+      fetch('http://localhost:8080/getCoordinates', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({allCoordinates:data})
       })
       .catch(console.log)
   }
@@ -315,6 +324,7 @@ class App extends Component {
         <Map
           lat={this.state.chosenLat}
           long = {this.state.chosenLong}
+          all = {this.state.allCoordinates}
           googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
           loadingElement={<div style={{ height: `100%` }} />}
           containerElement={<div style={{ height: `600px`, width: `100vh` }} />}

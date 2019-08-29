@@ -221,10 +221,46 @@ public class Requests {
         serviceMap.put("JSON", searchMap.toString());
         mapSet.add(serviceMap);
       }
-
     }
     client.close();
     return mapSet;
+  }
+
+  @GetMapping("/getCoordinates")
+  public Set<Map<String, String>> getAllCoordinates() throws IOException {
+    RestHighLevelClient client = initClient();
+
+    Set<Map<String, String>> mapSet = new HashSet<>();
+
+    SearchResponse searchResponse = getLocationResponse(client);
+    SearchHit[] searchHits = searchResponse.getHits().getHits();
+    for (SearchHit searchHit : searchHits) {
+      Map<String, Object> searchMap = searchHit.getSourceAsMap();
+//      System.out.println(searchMap);
+      String latitude = tryGet(searchMap, "location-latitude");
+      String longitude = tryGet(searchMap, "location-longitude");
+      Map<String, String> outputMap = new HashMap<>();
+      outputMap.put("latitude", latitude);
+      outputMap.put("longitude", longitude);
+      mapSet.add(outputMap);
+    }
+    client.close();
+    return mapSet;
+  }
+
+  private SearchResponse getLocationResponse(RestHighLevelClient client) throws IOException {
+    SearchRequest searchRequest = new SearchRequest("lookup");
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    BoolQueryBuilder query = QueryBuilders.boolQuery();
+    query.must(termQuery("type.keyword", "service"));
+    String[] includeFields = new String[] {"location-longitude", "location-latitude"};
+    String[] excludeFields = new String[0];
+    searchSourceBuilder.fetchSource(includeFields, excludeFields);
+    searchSourceBuilder.query(query);
+    searchSourceBuilder.from(0);
+    searchSourceBuilder.size(10000);
+    searchRequest.source(searchSourceBuilder);
+    return client.search(searchRequest, RequestOptions.DEFAULT);
   }
 
   private SearchResponse searchResponse(RestHighLevelClient client) throws IOException {
