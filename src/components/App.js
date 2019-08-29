@@ -43,6 +43,8 @@ class App extends Component {
       keys: [],
       chosenKey: "",
       searchTerm: "",
+      tableStart: 0,
+      tableEnd: 10,
       hostResults: [],
       serviceVisibility: true,
       chosenHost: "",
@@ -155,7 +157,7 @@ class App extends Component {
     } else {
       var key = ""
     }
-    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=10", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=100", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ hostResults: data })
@@ -168,7 +170,7 @@ class App extends Component {
 
   getHost(props) {
     const hostInformation = props.hostInformation;
-    const hostTable = hostInformation.map((host) =>
+    const hostTable = hostInformation.slice(this.state.tableStart,this.state.tableEnd).map((host) =>
       <tr key={host["Host Name"]} >
         <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Host Name"]}</td>
         <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Hardware"]}</td>
@@ -296,6 +298,8 @@ class App extends Component {
                     </thead>
                     <this.getHost hostInformation={this.state.hostResults} />
                   </Table>
+                  <Button variant="warning" onClick={() => { this.setState({tableEnd:this.state.tableEnd-10, tableStart: this.state.tableStart-10}) }}>Previous</Button>
+                  <Button variant="warning" onClick={() => { this.setState({tableEnd:this.state.tableEnd+10, tableStart: this.state.tableStart+10}) }}>Next</Button>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
                   <Table striped bordered hover variant="dark" >
