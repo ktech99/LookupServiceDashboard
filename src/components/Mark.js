@@ -27,7 +27,7 @@ export default class Mark extends React.Component {
         >
           {this.state.isOpen && 
                 <InfoWindow onCloseClick={this.onToggle}>
-                    <div>Open</div>
+                    <div>{this.props.host}</div>
                 </InfoWindow>}
         </Marker>
     );

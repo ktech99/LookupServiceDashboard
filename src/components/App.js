@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import '../styles/App.css';
-import logo from "../image/Logo.png";
-import { Jumbotron, Button, ListGroup, Dropdown, ButtonToolbar, Table, Tab, Row, Col, Nav } from 'react-bootstrap'
+import { Jumbotron, Button, Dropdown, Table, Tab, Row, Col, Nav } from 'react-bootstrap'
 import Search from "react-search"
-import { thisExpression } from '@babel/types';
-import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import Mark from "./Mark";
 import dot from "../image/dot.png"
@@ -24,13 +21,13 @@ const Map = withScriptjs(withGoogleMap((props) => {
     props.hostResults.map(coord => <Mark
       key={Math.random()}
       location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
+      host = {coord["Host Name"]}
       icon={dot}
     />));
   return (
     <GoogleMap
       defaultZoom={2}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
-
     >
       {markers}
     </GoogleMap>
