@@ -15,6 +15,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
   const markers = (props.hostResults.length === 0 ? props.all.map(coord => <Mark
     key={Math.random()}
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
+    host = {coord["Host Name"]}
     icon={dot}
   />)
     :

@@ -251,9 +251,11 @@ public class Requests {
       //      System.out.println(searchMap);
       String latitude = tryGet(searchMap, "location-latitude");
       String longitude = tryGet(searchMap, "location-longitude");
+      String hostName = tryGet(searchMap, "host-name");
       Map<String, String> outputMap = new HashMap<>();
       outputMap.put("latitude", latitude);
       outputMap.put("longitude", longitude);
+      outputMap.put("Host Name", hostName);
       mapSet.add(outputMap);
     }
     client.close();
@@ -265,7 +267,7 @@ public class Requests {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     query.must(termQuery("type.keyword", "host"));
-    String[] includeFields = new String[] {"location-longitude", "location-latitude"};
+    String[] includeFields = new String[] {"location-longitude", "location-latitude", "host-name"};
     String[] excludeFields = new String[0];
     searchSourceBuilder.fetchSource(includeFields, excludeFields);
     searchSourceBuilder.query(query);
