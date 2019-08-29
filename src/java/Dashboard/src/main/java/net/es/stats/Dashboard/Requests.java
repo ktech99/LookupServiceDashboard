@@ -252,7 +252,7 @@ public class Requests {
     SearchRequest searchRequest = new SearchRequest("lookup");
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder query = QueryBuilders.boolQuery();
-    query.must(termQuery("type.keyword", "service"));
+    query.must(termQuery("type.keyword", "host"));
     String[] includeFields = new String[] {"location-longitude", "location-latitude"};
     String[] excludeFields = new String[0];
     searchSourceBuilder.fetchSource(includeFields, excludeFields);

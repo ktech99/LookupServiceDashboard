@@ -7,6 +7,7 @@ import { thisExpression } from '@babel/types';
 import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import Mark from "./Mark";
+import dot from "../image/dot.png"
 
 // import Map from "./Map"
 
@@ -15,19 +16,13 @@ const Map = withScriptjs(withGoogleMap((props) => {
     const markers = props.all.map( coord => <Mark
                       key= {Math.random()}
                       location={{lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude)}}
-                    
+                      icon={dot}
                     />);
-  console.log(props)
   return (
     <GoogleMap
       defaultZoom={14}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
     >
-      {/* <Mark
-        key={1}
-        doctor={2}
-        location={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
-      /> */}
       {markers}
     </GoogleMap>
   );
