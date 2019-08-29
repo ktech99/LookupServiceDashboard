@@ -1,32 +1,19 @@
 package net.es.stats.Dashboard;
 
-import ch.qos.logback.core.util.SystemInfo;
 import org.apache.http.HttpHost;
-import org.apache.lucene.analysis.LowerCaseFilter;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RestClient;
 
 import org.elasticsearch.client.RequestOptions;
 
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.FetchSourceContext;
-import org.springframework.data.convert.ReadingConverter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -37,22 +24,22 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 @RestController
 public class Requests {
 
+  /**
+   * Get list of group communities for initially loading the dropdown
+   *
+   * @return list of group communities available to choose from in alphabetical order
+   * @throws IOException if error getting value from database
+   */
   @GetMapping("/groupCommunities")
   public Set<String> getGroupCommunities() throws IOException {
     RestHighLevelClient client = initClient();
 
     SearchResponse searchResponse = searchResponse(client);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
-    Set<String> communities = new TreeSet<String>();
+    Set<String> communities = new TreeSet<>();
     for (SearchHit hit : searchHits) {
-      String community = "";
-      try {
-        community = (hit.getSourceAsMap()).get("group-communities").toString();
-
-      } catch (Exception e) {
-        // todo
-      }
-      community = community.replace("[", "").replace("]", "");
+      String community;
+      community = tryGet(hit.getSourceAsMap(), "group-communities");
       String[] communityArr = community.split(",");
       for (String s : communityArr) {
         if (!s.trim().equals("")) {
@@ -64,20 +51,21 @@ public class Requests {
     return communities;
   }
 
+  /**
+   * Get list of initial pscheduler tests to populate dropdown
+   *
+   * @return list of pScheduler Tests available to choose from in alphabetical order
+   * @throws IOException if error getting value from database
+   */
   @GetMapping("/pSchedulerTests")
   public Set<String> getPSchedulerTests() throws IOException {
     RestHighLevelClient client = initClient();
     SearchResponse searchResponse = searchResponse(client);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
-    Set<String> schedulers = new TreeSet<String>();
+    Set<String> schedulers = new TreeSet<>();
     for (SearchHit hit : searchHits) {
-      String scheduler = "";
-      try {
-        scheduler = (hit.getSourceAsMap()).get("pscheduler-tests").toString();
-      } catch (Exception e) {
-        // todo
-      }
-      scheduler = scheduler.replace("[", "").replace("]", "");
+      String scheduler;
+      scheduler = tryGet(hit.getSourceAsMap(), "pscheduler-tests");
       String[] schedulerArr = scheduler.split(",");
       for (String s : schedulerArr) {
         if (!s.trim().equals("")) {
@@ -89,6 +77,12 @@ public class Requests {
     return schedulers;
   }
 
+  /**
+   * List of all available keys in the document to populate autofill search
+   *
+   * @return List of available keys in alphabetical order
+   * @throws IOException if unable to search database
+   */
   @GetMapping("/getAllKeys")
   public Set<Object> getKeys() throws IOException {
     RestHighLevelClient client = initClient();
@@ -101,6 +95,16 @@ public class Requests {
     return keys;
   }
 
+  /**
+   * List of host data to populate host table
+   * @param key key chosen by user
+   * @param groupCommunity group community chosen by user
+   * @param pSchedulers pschedulers chosen by user surrounded by [] and separated by ,
+   * @param searchTerm term the user is trying to search for; Has to have particular key
+   * @param limit Number of terms returned
+   * @return list of values of all hosts that match the search criteria
+   * @throws IOException if unable to search database
+   */
   @GetMapping("/search")
   public Set<Map<String, String>> searchHosts(
       @RequestParam String key,
@@ -110,6 +114,7 @@ public class Requests {
       @RequestParam int limit)
       throws IOException {
     RestHighLevelClient client = initClient();
+
     SearchResponse searchResponse =
         searchHostResponse(client, key, groupCommunity, searchTerm, limit);
     SearchHit[] searchHits = searchResponse.getHits().getHits();
@@ -118,41 +123,37 @@ public class Requests {
 
     for (SearchHit hit : searchHits) {
       Map<String, Object> sourceMap = hit.getSourceAsMap();
-      //            System.out.println(sourceMap);
-      String uri = sourceMap.get("uri").toString().replace("[", "").replace("]", "");
-      String interfaces =
-          sourceMap.get("host-net-interfaces").toString().replace("[", "").replace("]", "");
+      String uri = tryGet(sourceMap, "uri");
+      String interfaces = tryGet(sourceMap, "host-net-interface");
+      String hostName = tryGet(sourceMap, "host-name");
+      StringBuilder hardware = new StringBuilder();
+      String processor = "\n"; // todo processor?
+      String memory = tryGet(sourceMap, "host-hardware-memory");
+
+      // Get interfaces of a given host
       SearchResponse interfaceSearchResponse =
           searchInterfaceResponse(client, pSchedulers.split(","), interfaces.split(","));
       SearchHit[] interfaceHits = interfaceSearchResponse.getHits().getHits();
 
+      // next iteration on empty interface
       if (interfaceHits.length == 0) {
         continue;
       }
 
-      String hostName = sourceMap.get("host-name").toString().replace("[", "").replace("]", "");
-
-      StringBuilder hardware = new StringBuilder();
-      String processor = "\n"; // todo processor?
-      String memory =
-          sourceMap.get("host-hardware-memory").toString().replace("[", "").replace("]", "") + "\n";
       int interfaceCount = 1;
       String interfaceHardware = "";
       String pschedulerTests = "";
+
       for (SearchHit interfaceHit : interfaceHits) {
-        //                System.out.println(interfaceHit.getSourceAsMap());
         Map<String, Object> interfaceMap = interfaceHit.getSourceAsMap();
         interfaceHardware = "NIC #" + interfaceCount + " Speed: " + "\n";
         // Todo speed?
         interfaceHardware +=
             "NIC #" + interfaceCount + " MTU: " + interfaceMap.get("interface-mtu");
-        try {
-          pschedulerTests = interfaceMap.get("pscheduler-tests").toString();
-        } catch (Exception e) {
-          //          e.printStackTrace();
-        }
+        pschedulerTests = tryGet(interfaceMap, "pscheduler-tests");
         interfaceCount++;
       }
+
       hardware.append(processor);
       hardware.append("Memory: ");
       hardware.append(memory);
@@ -190,6 +191,12 @@ public class Requests {
     return setMap;
   }
 
+  /**
+   * list of services under a particular host
+   * @param hosts host for which to find services - separated by , if multiple
+   * @return list of services with values used to populating the services table
+   * @throws IOException if unable to connect to database
+   */
   @GetMapping("/searchService")
   public Set<Map<String, String>> searchService(@RequestParam String hosts) throws IOException {
     RestHighLevelClient client = initClient();
@@ -226,6 +233,11 @@ public class Requests {
     return mapSet;
   }
 
+  /**
+   * returns list of coordinates of all hosts
+   * @return list of coordinates of all hosts
+   * @throws IOException if unable to connect to database
+   */
   @GetMapping("/getCoordinates")
   public Set<Map<String, String>> getAllCoordinates() throws IOException {
     RestHighLevelClient client = initClient();
@@ -236,7 +248,7 @@ public class Requests {
     SearchHit[] searchHits = searchResponse.getHits().getHits();
     for (SearchHit searchHit : searchHits) {
       Map<String, Object> searchMap = searchHit.getSourceAsMap();
-//      System.out.println(searchMap);
+      //      System.out.println(searchMap);
       String latitude = tryGet(searchMap, "location-latitude");
       String longitude = tryGet(searchMap, "location-longitude");
       Map<String, String> outputMap = new HashMap<>();
