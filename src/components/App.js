@@ -13,15 +13,16 @@ import dot from "../image/dot.png"
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
-    const markers = props.all.map( coord => <Mark
-                      key= {Math.random()}
-                      location={{lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude)}}
-                      icon={dot}
-                    />);
+  const markers = props.all.map(coord => <Mark
+    key={Math.random()}
+    location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
+    icon={dot}
+  />);
   return (
     <GoogleMap
       defaultZoom={14}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
+      
     >
       {markers}
     </GoogleMap>
@@ -85,10 +86,10 @@ class App extends Component {
       })
       .catch(console.log)
 
-      fetch('http://localhost:8080/getCoordinates', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/getCoordinates', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
-        this.setState({allCoordinates:data})
+        this.setState({ allCoordinates: data })
       })
       .catch(console.log)
   }
@@ -316,15 +317,17 @@ class App extends Component {
             </Col>
           </Row>
         </Tab.Container>
-        <Map
-          lat={this.state.chosenLat}
-          long = {this.state.chosenLong}
-          all = {this.state.allCoordinates}
-          googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
-          loadingElement={<div style={{ height: `100%` }} />}
-          containerElement={<div style={{ height: `600px`, width: `100vh` }} />}
-          mapElement={<div style={{ height: `100%` }} />}
-        />
+        <div className="map">
+          <Map
+            lat={this.state.chosenLat}
+            long={this.state.chosenLong}
+            all={this.state.allCoordinates}
+            googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
+            loadingElement={<div style={{ height: `100%` }} />}
+            containerElement={<div style={{ height: `600px`, width: `100%` }} />}
+            mapElement={<div style={{ height: `100%` }} />}
+          />
+        </div>
         {/* {(this.state.showMap) ? <MapContainer lat = {this.state.chosenLat} long = {this.state.chosenLong}></MapContainer>: ''} */}
       </div>
     );
