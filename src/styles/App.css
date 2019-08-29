@@ -99,3 +99,26 @@ li.sc-bxivhb.iRISHI {
   border-radius: 0px !important;
 }
 
+/* Sidebar css */
+.flex-column.nav.nav-pills {
+  border: 1px solid grey;
+  border-radius: 7px;
+  text-align: center;
+}
+
+div#serviceTab {
+  border-top: 1px solid grey;
+  border-bottom: 1px solid grey;
+}
+
+a#informationTabs-tab-first {
+  border-radius: 0px;
+}
+
+a#informationTabs-tab-second {
+  border-radius: 0px;
+}
+
+a#informationTabs-tab-third {
+  border-radius: 0px;
+}
