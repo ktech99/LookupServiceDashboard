@@ -20,17 +20,17 @@ const Map = withScriptjs(withGoogleMap((props) => {
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
     icon={dot}
   />)
-  : 
-  props.hostResults.map(coord => <Mark
-    key={Math.random()}
-    location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
-    icon={dot}
-  />));
+    :
+    props.hostResults.map(coord => <Mark
+      key={Math.random()}
+      location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
+      icon={dot}
+    />));
   return (
     <GoogleMap
-      defaultZoom={10}
+      defaultZoom={2}
       center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
-      
+
     >
       {markers}
     </GoogleMap>
@@ -70,6 +70,8 @@ class App extends Component {
     this.chooseHost = this.chooseHost.bind(this);
     this.searchService = this.searchService.bind(this)
     this.getService = this.getService.bind(this);
+    this.hostTableNext = this.hostTableNext.bind(this);
+    this.hostTablePrev = this.hostTablePrev.bind(this);
   }
 
   componentDidMount() {
@@ -178,7 +180,7 @@ class App extends Component {
 
   getHost(props) {
     const hostInformation = props.hostInformation;
-    const hostTable = hostInformation.slice(this.state.tableStart,this.state.tableEnd).map((host) =>
+    const hostTable = hostInformation.slice(this.state.tableStart, this.state.tableEnd).map((host) =>
       <tr key={host["Host Name"]} >
         <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Host Name"]}</td>
         <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Hardware"]}</td>
@@ -238,6 +240,18 @@ class App extends Component {
     );
   }
 
+  hostTableNext() {
+    if (this.state.hostResults.length > this.state.tableEnd) {
+      this.setState({ tableEnd: this.state.tableEnd + 10, tableStart: this.state.tableStart + 10 })
+    }
+  }
+
+  hostTablePrev() {
+    if (this.state.tableStart - 10 >= 0) {
+      this.setState({ tableEnd: this.state.tableEnd - 10, tableStart: this.state.tableStart - 10 })
+    }
+  }
+
   showServiceJSON(host) {
     console.log(host)
     alert(host["service"]["JSON"])
@@ -287,11 +301,19 @@ class App extends Component {
                 <Nav.Item id="serviceTab">
                   <Nav.Link eventKey="second" disabled={this.state.serviceVisibility} >Service Information</Nav.Link>
                 </Nav.Item>
+                <Nav.Item id="mapTab">
+                  <Nav.Link eventKey="third">Map</Nav.Link>
+                </Nav.Item>
               </Nav>
             </Col>
             <Col sm={9}>
               <Tab.Content>
                 <Tab.Pane eventKey="first">
+                  <div className="prevNextButton">
+                    <Button variant="info" onClick={this.hostTablePrev} className= "prevButton">Previous</Button>
+                    <Button variant="danger" onClick={this.hostTableNext} className= "nextButton">Next</Button>
+                  </div>
+
                   <Table striped bordered hover variant="dark">
                     <thead>
                       <tr>
@@ -306,8 +328,6 @@ class App extends Component {
                     </thead>
                     <this.getHost hostInformation={this.state.hostResults} />
                   </Table>
-                  <Button variant="warning" onClick={() => { this.setState({tableEnd:this.state.tableEnd-10, tableStart: this.state.tableStart-10}) }}>Previous</Button>
-                  <Button variant="warning" onClick={() => { this.setState({tableEnd:this.state.tableEnd+10, tableStart: this.state.tableStart+10}) }}>Next</Button>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
                   <Table striped bordered hover variant="dark" >
@@ -325,23 +345,24 @@ class App extends Component {
                     <this.getService serviceInformation={this.state.serviceResults} />
                   </Table>
                 </Tab.Pane>
+                <Tab.Pane eventKey="third">
+                  <div className="map">
+                    <Map
+                      lat={this.state.chosenLat}
+                      long={this.state.chosenLong}
+                      all={this.state.allCoordinates}
+                      hostResults={this.state.hostResults}
+                      googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
+                      loadingElement={<div style={{ height: `100%` }} />}
+                      containerElement={<div style={{ height: `600px`, width: `100%` }} />}
+                      mapElement={<div style={{ height: `100%` }} />}
+                    />
+                  </div>
+                </Tab.Pane>
               </Tab.Content>
             </Col>
           </Row>
         </Tab.Container>
-        <div className="map">
-          <Map
-            lat={this.state.chosenLat}
-            long={this.state.chosenLong}
-            all={this.state.allCoordinates}
-            hostResults={this.state.hostResults}
-            googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `600px`, width: `100%` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-          />
-        </div>
-        {/* {(this.state.showMap) ? <MapContainer lat = {this.state.chosenLat} long = {this.state.chosenLong}></MapContainer>: ''} */}
       </div>
     );
   }

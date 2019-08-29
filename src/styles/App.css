@@ -81,8 +81,21 @@ li.sc-bxivhb.iRISHI {
 
 .map{
   height:100%;
-  width:50%;
+  width:100%;
   text-align: center !important;
   margin-left: auto;
   margin-right: auto;
 }
+
+.prevNextButton{
+  text-align: right;
+}
+
+.prevButton{
+  border-radius: 0px !important;
+}
+
+.nextButton{
+  border-radius: 0px !important;
+}
+
