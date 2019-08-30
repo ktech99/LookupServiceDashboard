@@ -97,6 +97,7 @@ public class Requests {
 
   /**
    * List of host data to populate host table
+   *
    * @param key key chosen by user
    * @param groupCommunity group community chosen by user
    * @param pSchedulers pschedulers chosen by user surrounded by [] and separated by ,
@@ -193,6 +194,7 @@ public class Requests {
 
   /**
    * list of services under a particular host
+   *
    * @param hosts host for which to find services - separated by , if multiple
    * @return list of services with values used to populating the services table
    * @throws IOException if unable to connect to database
@@ -235,6 +237,7 @@ public class Requests {
 
   /**
    * returns list of coordinates of all hosts
+   *
    * @return list of coordinates of all hosts
    * @throws IOException if unable to connect to database
    */
@@ -252,14 +255,54 @@ public class Requests {
       String latitude = tryGet(searchMap, "location-latitude");
       String longitude = tryGet(searchMap, "location-longitude");
       String hostName = tryGet(searchMap, "host-name");
+      String uri = tryGet(searchMap, "uri");
       Map<String, String> outputMap = new HashMap<>();
       outputMap.put("latitude", latitude);
       outputMap.put("longitude", longitude);
       outputMap.put("Host Name", hostName);
+      outputMap.put("URI", uri);
       mapSet.add(outputMap);
     }
     client.close();
     return mapSet;
+  }
+
+  @GetMapping("/getTypeOfServiceHost")
+  public Set<String> getTypesofServiceHost(@RequestParam String hosts) throws IOException {
+    RestHighLevelClient client = initClient();
+
+    Set<String> mapSet = new HashSet<>();
+    for (String host : hosts.split(",")) {
+      System.out.println(host);
+      SearchResponse searchResponse = searchServiceResponse(client, host);
+      SearchHit[] searchHits = searchResponse.getHits().getHits();
+      for (SearchHit searchHit : searchHits) {
+        Map<String, Object> searchMap = searchHit.getSourceAsMap();
+        //        System.out.println(searchMap);
+        String serviceType = tryGet(searchMap, "service-type");
+        mapSet.add(serviceType);
+      }
+    }
+
+    client.close();
+    return mapSet;
+  }
+
+  private SearchResponse getHostServiceTypeResponse(RestHighLevelClient client, String host)
+      throws IOException {
+    SearchRequest searchRequest = new SearchRequest("lookup");
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    BoolQueryBuilder query = QueryBuilders.boolQuery();
+    query.must(termQuery("service-host.keyword", host));
+    query.must(termQuery("type.keyword", "service"));
+    //    String[] includeFields = new String[] {"service-type"};
+    //    String[] excludeFields = new String[0];
+    searchSourceBuilder.fetchSource();
+    searchSourceBuilder.query(query);
+    searchSourceBuilder.from(0);
+    searchSourceBuilder.size(10000);
+    searchRequest.source(searchSourceBuilder);
+    return client.search(searchRequest, RequestOptions.DEFAULT);
   }
 
   private SearchResponse getLocationResponse(RestHighLevelClient client) throws IOException {
@@ -267,7 +310,8 @@ public class Requests {
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder query = QueryBuilders.boolQuery();
     query.must(termQuery("type.keyword", "host"));
-    String[] includeFields = new String[] {"location-longitude", "location-latitude", "host-name"};
+    String[] includeFields =
+        new String[] {"location-longitude", "location-latitude", "host-name", "uri"};
     String[] excludeFields = new String[0];
     searchSourceBuilder.fetchSource(includeFields, excludeFields);
     searchSourceBuilder.query(query);

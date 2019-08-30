@@ -16,6 +16,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
     key={Math.random()}
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
     host = {coord["Host Name"]}
+    hostUri = {coord["URI"]}
     icon={dot}
   />)
     :
@@ -23,6 +24,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
       key={Math.random()}
       location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
       host = {coord["Host Name"]}
+      hostUri = {coord["URI"]}
       icon={dot}
     />));
   return (
