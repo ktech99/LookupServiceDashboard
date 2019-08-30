@@ -278,7 +278,6 @@ public class Requests {
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
-        //        System.out.println(searchMap);
         String serviceType = tryGet(searchMap, "service-type");
         mapSet.add(serviceType);
       }
