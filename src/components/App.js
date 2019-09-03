@@ -10,8 +10,6 @@ import dot from "../image/dot.png"
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
-  console.log(props.hostResults.length)
-
   const markers = (props.hostResults.length === 0 ? props.all.map(coord => <Mark
     key={Math.random()}
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
