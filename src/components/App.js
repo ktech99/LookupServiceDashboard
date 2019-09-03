@@ -24,7 +24,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
       location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
       host = {coord["Host Name"]}
       hostUri = {coord["URI"]}
-      test = {props.test}
+      callback = {props.chooseHostCallback}
       icon={dot}
     />));
   return (

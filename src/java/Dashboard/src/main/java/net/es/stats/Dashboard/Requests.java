@@ -215,7 +215,6 @@ public class Requests {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
         Map<String, String> serviceMap = new HashMap<>();
         String serviceType = tryGet(searchMap, "service-type");
-        System.out.println(serviceType);
         if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase(serviceType)) {
           String name = tryGet(searchMap, "service-name");
           String address = ""; // todo address
