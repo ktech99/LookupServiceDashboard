@@ -207,12 +207,12 @@ public class Requests {
     Set<Map<String, String>> mapSet = new HashSet<>();
 
     for (String host : hostArray) {
-      Map<String, String> serviceMap = new HashMap<>();
+
       SearchResponse searchResponse = searchServiceResponse(client, host);
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
-        System.out.println(searchMap);
+        Map<String, String> serviceMap = new HashMap<>();
         String name = tryGet(searchMap, "service-name");
         String address = ""; // todo address
         String location = ""; // todo location
@@ -273,7 +273,7 @@ public class Requests {
 
     Set<String> mapSet = new HashSet<>();
     for (String host : hosts.split(",")) {
-      System.out.println(host);
+//      System.out.println(host);
       SearchResponse searchResponse = searchServiceResponse(client, host);
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {

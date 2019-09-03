@@ -48,6 +48,8 @@ export default class Mark extends React.Component {
         {this.state.isOpen &&
           <InfoWindow onCloseClick={this.onToggle}>
             <div><b>{this.props.host}</b>
+            <br></br>                <br></br>
+
               <Table striped bordered hover>
                 <thead>
                   <tr>
