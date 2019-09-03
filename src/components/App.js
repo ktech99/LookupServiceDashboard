@@ -15,6 +15,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
     host = {coord["Host Name"]}
     hostUri = {coord["URI"]}
+    callback = {props.chooseHostCallback}
     icon={dot}
   />)
     :
@@ -23,6 +24,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
       location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
       host = {coord["Host Name"]}
       hostUri = {coord["URI"]}
+      test = {props.test}
       icon={dot}
     />));
   return (
@@ -70,6 +72,7 @@ class App extends Component {
     this.getService = this.getService.bind(this);
     this.hostTableNext = this.hostTableNext.bind(this);
     this.hostTablePrev = this.hostTablePrev.bind(this);
+    this.chooseHostFromMap = this.chooseHostFromMap.bind(this);
   }
 
   componentDidMount() {
@@ -198,7 +201,7 @@ class App extends Component {
 
   chooseHost(hostName, latitude, longitude) {
     this.setState({ serviceVisibility: false });
-    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService() })
+    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService("all") })
     // this.searchService()
   }
 
@@ -207,8 +210,13 @@ class App extends Component {
     alert(host["host"]["JSON"])
   }
 
-  searchService() {
-    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+  chooseHostFromMap(hostName, type) {
+    this.setState({ serviceVisibility: false });
+    this.setState({ chosenHost: hostName }, function () { this.searchService(type)})
+  }
+
+  searchService(type) {
+    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost+"&type="+type, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ serviceResults: data })
@@ -236,6 +244,10 @@ class App extends Component {
         {serviceTable}
       </tbody>
     );
+  }
+
+  test(){
+    console.log("pass")
   }
 
   hostTableNext() {
@@ -350,6 +362,7 @@ class App extends Component {
                       long={this.state.chosenLong}
                       all={this.state.allCoordinates}
                       hostResults={this.state.hostResults}
+                      chooseHostCallback = {this.chooseHostFromMap}
                       googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
                       loadingElement={<div style={{ height: `100%` }} />}
                       containerElement={<div style={{ height: `600px`, width: `100%` }} />}

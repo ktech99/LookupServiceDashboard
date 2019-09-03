@@ -196,11 +196,12 @@ public class Requests {
    * list of services under a particular host
    *
    * @param hosts host for which to find services - separated by , if multiple
+   * @param type type of server to search for - "all" to get all type of servers
    * @return list of services with values used to populating the services table
    * @throws IOException if unable to connect to database
    */
   @GetMapping("/searchService")
-  public Set<Map<String, String>> searchService(@RequestParam String hosts) throws IOException {
+  public Set<Map<String, String>> searchService(@RequestParam String hosts, @RequestParam String type) throws IOException {
     RestHighLevelClient client = initClient();
     String[] hostArray = hosts.split(",");
 
@@ -213,22 +214,26 @@ public class Requests {
       for (SearchHit searchHit : searchHits) {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
         Map<String, String> serviceMap = new HashMap<>();
-        String name = tryGet(searchMap, "service-name");
-        String address = ""; // todo address
-        String location = ""; // todo location
-        String communities = tryGet(searchMap, "group-communities");
-        String version = tryGet(searchMap, "service-version");
-        String command = ""; // todo command
         String serviceType = tryGet(searchMap, "service-type");
-        serviceMap.put("name", name);
-        serviceMap.put("address", address);
-        serviceMap.put("location", location);
-        serviceMap.put("communities", communities);
-        serviceMap.put("version", version);
-        serviceMap.put("command", command);
-        serviceMap.put("type", serviceType);
-        serviceMap.put("JSON", searchMap.toString());
-        mapSet.add(serviceMap);
+        System.out.println(serviceType);
+        if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase(serviceType)) {
+          String name = tryGet(searchMap, "service-name");
+          String address = ""; // todo address
+          String location = ""; // todo location
+          String communities = tryGet(searchMap, "group-communities");
+          String version = tryGet(searchMap, "service-version");
+          String command = ""; // todo command
+
+          serviceMap.put("name", name);
+          serviceMap.put("address", address);
+          serviceMap.put("location", location);
+          serviceMap.put("communities", communities);
+          serviceMap.put("version", version);
+          serviceMap.put("command", command);
+          serviceMap.put("type", serviceType);
+          serviceMap.put("JSON", searchMap.toString());
+          mapSet.add(serviceMap);
+        }
       }
     }
     client.close();
