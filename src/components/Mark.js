@@ -23,16 +23,16 @@ export default class Mark extends React.Component {
   }
 
   getServiceType(hostName) {
-    console.log(hostName)
+    if(this.state.server.length === 0){
     fetch('http://localhost:8080/getTypeOfServiceHost?hosts=' + this.props.hostUri, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ server: data })
       })
       .catch(console.log)
-
+    }
     const serverTable = hostName.hostName.map((server) =>
-      <tr>
+      <tr key={Math.random()}>
         <td>{server}</td>
       </tr>);
     return serverTable;
@@ -43,6 +43,7 @@ export default class Mark extends React.Component {
         position={this.props.location}
         icon={dot}
         onClick={this.onToggle}
+        
       >
         {this.state.isOpen &&
           <InfoWindow onCloseClick={this.onToggle}>
@@ -54,7 +55,7 @@ export default class Mark extends React.Component {
                   </tr>
                 </thead>
                 <tbody>
-                  <this.getServiceType hostName={this.state.server}></this.getServiceType>
+                  <this.getServiceType hostName={this.state.server} ></this.getServiceType>
                 </tbody>
               </Table>
               {/* <this.getServiceType hostName={this.props.hostUri} /> */}
