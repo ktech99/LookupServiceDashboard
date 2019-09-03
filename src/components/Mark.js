@@ -17,7 +17,7 @@ export default class Mark extends React.Component {
     this.onToggle = this.onToggle.bind(this);
     this.getServiceType = this.getServiceType.bind(this);
   }
-  componentDidMount(){
+  componentDidLoad(){
     fetch('http://localhost:8080/getTypeOfServiceHost?hosts=' + this.props.hostUri, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
