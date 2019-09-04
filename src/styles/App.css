@@ -69,8 +69,16 @@ li.sc-bxivhb.iRISHI {
   background-color: #eee;
 }
 
-.submitButton{
-  margin-top:20px;
+
+
+.inlineButtons {
+  display: inline-block;
+  margin: 10px;
+}
+
+.clearButton {
+  display: inline-block;
+  margin: 10px;
 }
 
 .scrollBox{

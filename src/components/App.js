@@ -5,6 +5,9 @@ import Search from "react-search"
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import Mark from "./Mark";
 import dot from "../image/dot.png"
+import { get } from 'http';
+import ReactDOM from "react-dom";
+
 
 // import Map from "./Map"
 
@@ -13,24 +16,24 @@ const Map = withScriptjs(withGoogleMap((props) => {
   const markers = (props.hostResults.length === 0 ? props.all.map(coord => <Mark
     key={Math.random()}
     location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
-    host = {coord["Host Name"]}
-    hostUri = {coord["URI"]}
-    callback = {props.chooseHostCallback}
+    host={coord["Host Name"]}
+    hostUri={coord["URI"]}
+    callback={props.chooseHostCallback}
     icon={dot}
   />)
     :
     props.hostResults.map(coord => <Mark
       key={Math.random()}
       location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
-      host = {coord["Host Name"]}
-      hostUri = {coord["URI"]}
-      callback = {props.chooseHostCallback}
+      host={coord["Host Name"]}
+      hostUri={coord["URI"]}
+      callback={props.chooseHostCallback}
       icon={dot}
     />));
   return (
     <GoogleMap
-      defaultZoom={2}
-      center={{ lat: parseFloat(props.lat), lng: parseFloat(props.long) }}
+      defaultZoom={3}
+      center={{ lat: 37.8715, lng: 122.2730 }}
     >
       {markers}
     </GoogleMap>
@@ -73,6 +76,7 @@ class App extends Component {
     this.hostTableNext = this.hostTableNext.bind(this);
     this.hostTablePrev = this.hostTablePrev.bind(this);
     this.chooseHostFromMap = this.chooseHostFromMap.bind(this);
+    this.clear = this.clear.bind(this);
   }
 
   componentDidMount() {
@@ -158,8 +162,9 @@ class App extends Component {
   keySelect(items) {
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
-      console.log(items[0]["value"])
     }
+    var selector = document.getElementById("search-input");
+    selector.value = "";
   }
 
   searchHost() {
@@ -212,11 +217,11 @@ class App extends Component {
 
   chooseHostFromMap(hostName, type) {
     this.setState({ serviceVisibility: false });
-    this.setState({ chosenHost: hostName }, function () { this.searchService(type)})
+    this.setState({ chosenHost: hostName }, function () { this.searchService(type) })
   }
 
   searchService(type) {
-    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost+"&type="+type, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost + "&type=" + type, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ serviceResults: data })
@@ -246,10 +251,6 @@ class App extends Component {
     );
   }
 
-  test(){
-    console.log("pass")
-  }
-
   hostTableNext() {
     if (this.state.hostResults.length > this.state.tableEnd) {
       this.setState({ tableEnd: this.state.tableEnd + 10, tableStart: this.state.tableStart + 10 })
@@ -266,6 +267,45 @@ class App extends Component {
     console.log(host)
     alert(host["service"]["JSON"])
   }
+
+  clear(){
+    this.setState({
+      selectedGroupCommunity: "",
+      chosenSchedulers: [],
+      chosenKey: "",
+      searchTerm: "",
+      tableStart: 0,
+      tableEnd: 10,
+      hostResults: [],
+      serviceVisibility: true,
+      chosenHost: "",
+      serviceResults: [],
+      chosenLat: 0,
+      chosenLong: 0,
+      showMap: true,
+    })
+    var communityDrop = document.getElementById("communitiesdropDown");
+    communityDrop.textContent = "Group communities";
+    var box = document.getElementsByClassName('schedulerCheckBox');
+        for (var i = 0; i < box.length; i++) {
+            if (box[i].type == 'checkbox')
+                box[i].checked = false;
+        }
+        var selector = document.getElementById("search-input");
+        console.log(selector.value)
+        var ul = document.getElementsByClassName("sc-htpNat cqaNcS")[0];
+        console.log(ul)
+        var lis = (ul.getElementsByTagName("li"))
+        if(lis.length > 0){
+          ul.removeChild(lis[0]);
+        }
+        selector.className = "sc-bwzfXH LBGII"
+        selector.placeholder = "Eneter a key (optional) : "
+        var searchBar = document.getElementById("searchBar")
+        searchBar.value = "";
+  }
+
+
 
   render() {
     return (
@@ -296,8 +336,11 @@ class App extends Component {
 
             </Dropdown>
           </div>
-          <div className="submitButton">
-            <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
+          <div>
+            <div className="inlineButtons">
+              <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
+              <Button variant="danger" onClick={() => { this.clear() }} className="clearButton">Clear</Button>
+            </div>
           </div>
         </Jumbotron>
 
@@ -320,8 +363,8 @@ class App extends Component {
               <Tab.Content>
                 <Tab.Pane eventKey="first">
                   <div className="prevNextButton">
-                    <Button variant="info" onClick={this.hostTablePrev} className= "prevButton">Previous</Button>
-                    <Button variant="danger" onClick={this.hostTableNext} className= "nextButton">Next</Button>
+                    <Button variant="info" onClick={this.hostTablePrev} className="prevButton">Previous</Button>
+                    <Button variant="danger" onClick={this.hostTableNext} className="nextButton">Next</Button>
                   </div>
 
                   <Table striped bordered hover variant="dark">
@@ -362,7 +405,7 @@ class App extends Component {
                       long={this.state.chosenLong}
                       all={this.state.allCoordinates}
                       hostResults={this.state.hostResults}
-                      chooseHostCallback = {this.chooseHostFromMap}
+                      chooseHostCallback={this.chooseHostFromMap}
                       googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
                       loadingElement={<div style={{ height: `100%` }} />}
                       containerElement={<div style={{ height: `600px`, width: `100%` }} />}
