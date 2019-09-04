@@ -268,7 +268,7 @@ class App extends Component {
     alert(host["service"]["JSON"])
   }
 
-  clear(){
+  clear() {
     this.setState({
       selectedGroupCommunity: "",
       chosenSchedulers: [],
@@ -287,22 +287,22 @@ class App extends Component {
     var communityDrop = document.getElementById("communitiesdropDown");
     communityDrop.textContent = "Group communities";
     var box = document.getElementsByClassName('schedulerCheckBox');
-        for (var i = 0; i < box.length; i++) {
-            if (box[i].type == 'checkbox')
-                box[i].checked = false;
-        }
-        var selector = document.getElementById("search-input");
-        console.log(selector.value)
-        var ul = document.getElementsByClassName("sc-htpNat cqaNcS")[0];
-        console.log(ul)
-        var lis = (ul.getElementsByTagName("li"))
-        if(lis.length > 0){
-          ul.removeChild(lis[0]);
-        }
-        selector.className = "sc-bwzfXH LBGII"
-        selector.placeholder = "Eneter a key (optional) : "
-        var searchBar = document.getElementById("searchBar")
-        searchBar.value = "";
+    for (var i = 0; i < box.length; i++) {
+      if (box[i].type == 'checkbox')
+        box[i].checked = false;
+    }
+    var selector = document.getElementById("search-input");
+    console.log(selector.value)
+    var ul = document.getElementsByClassName("sc-htpNat cqaNcS")[0];
+    console.log(ul)
+    var lis = (ul.getElementsByTagName("li"))
+    if (lis.length > 0) {
+      ul.removeChild(lis[0]);
+    }
+    selector.className = "sc-bwzfXH LBGII";
+    selector.placeholder = "Eneter a key (optional) : ";
+    var searchBar = document.getElementById("searchBar");
+    searchBar.value = "";
   }
 
 
@@ -311,37 +311,51 @@ class App extends Component {
     return (
       <div>
         <Jumbotron className="head">
-          <div>
-            <Search items={this.state.keys}
-              placeholder="Eneter a key (optional) : "
-              maxSelected={1}
-              multiple={true}
-              onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
-            <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
-          </div>
-          <div className="dropdownDiv">
-            <Dropdown className="dropdownDiv">
-              <Dropdown.Toggle variant="dark" id="communitiesdropDown">
-                Group communities
+          <div className="grid-container">
+            <div className="grid-item" />
+            <div className="grid-item">
+              <div>
+                <Search items={this.state.keys}
+                  placeholder="Eneter a key (optional) : "
+                  maxSelected={1}
+                  multiple={true}
+                  onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
+                <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
+              </div>
+              <div className="dropdownDiv">
+                <Dropdown className="dropdownDiv">
+                  <Dropdown.Toggle variant="dark" id="communitiesdropDown">
+                    Group communities
             </Dropdown.Toggle>
-              <this.getCommunities communities={this.state.groupCommunities} />
-            </Dropdown>
+                  <this.getCommunities communities={this.state.groupCommunities} />
+                </Dropdown>
 
-            <Dropdown className="dropdownDiv">
-              <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                pScheduler Tests
+                <Dropdown className="dropdownDiv">
+                  <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                    pScheduler Tests
             </Dropdown.Toggle>
 
-              <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
+                  <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
 
-            </Dropdown>
-          </div>
-          <div>
-            <div className="inlineButtons">
-              <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
-              <Button variant="danger" onClick={() => { this.clear() }} className="clearButton">Clear</Button>
+                </Dropdown>
+              </div>
+              <div>
+                <div className="inlineButtons">
+                  <Button variant="warning" onClick={() => { this.searchHost() }}>Submit</Button>
+                  <Button variant="danger" onClick={() => { this.clear() }} className="clearButton">Clear</Button>
+                </div>
+              </div>
+            </div>
+            <div className="grid-item" id="textbox">
+              <br></br>
+              <h5>How to use the LS Directory</h5>
+                <p className = "howToBox"><b>Key:</b> The key signifies the "key" in the key-value schema of the database</p>
+                <p className = "howToBox"><b>Search:</b> The search is the value needed for the selected key</p>
+                <p className = "howToBox"><b>Communities:</b> Filter for the group community value</p>
+                <p className = "howToBox"><b>pScheduler:</b> Filter for the pScheduler tests</p>
             </div>
           </div>
+
         </Jumbotron>
 
         <Tab.Container id="informationTabs" defaultActiveKey="first" className="informationTabs">

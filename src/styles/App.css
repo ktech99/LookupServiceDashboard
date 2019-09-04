@@ -107,6 +107,29 @@ li.sc-bxivhb.iRISHI {
   border-radius: 0px !important;
 }
 
+.textDiv{
+  display: inline-block;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 30% 40% 30%;
+}
+
+.grid-item {
+  text-align: center;
+}
+
+.grid-item#textbox {
+  background-color: #ffffff;
+  border-radius: 10px;
+}
+
+.howToBox{
+  text-align:left !important;
+  margin-left: 10px;
+}
+
 /* Sidebar css */
 .flex-column.nav.nav-pills {
   border: 1px solid grey;
