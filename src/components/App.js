@@ -7,6 +7,7 @@ import Mark from "./Mark";
 import dot from "../image/dot.png"
 import { get } from 'http';
 import ReactDOM from "react-dom";
+import { thisExpression } from '@babel/types';
 
 
 // import Map from "./Map"
@@ -77,6 +78,7 @@ class App extends Component {
     this.hostTablePrev = this.hostTablePrev.bind(this);
     this.chooseHostFromMap = this.chooseHostFromMap.bind(this);
     this.clear = this.clear.bind(this);
+    this.getChosenValues = this.getChosenValues.bind(this);
   }
 
   componentDidMount() {
@@ -134,13 +136,14 @@ class App extends Component {
     const listSchedulers = pSchedulers.map((scheduler) =>
       <label key={scheduler}>
         <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
-          console.log(this.state.chosenSchedulers);
+          // console.log(this.state.chosenSchedulers);
           const contains = this.state.chosenSchedulers.includes({ scheduler }.scheduler);
           if (contains) {
             var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) { return scheduler !== { scheduler }.scheduler });
             this.setState({ chosenSchedulers: remainingItems });
           } else {
             this.state.chosenSchedulers.push({ scheduler }.scheduler)
+            this.setState({chosenSchedulers: this.state.chosenSchedulers})
           }
 
         }}>
@@ -305,6 +308,18 @@ class App extends Component {
     searchBar.value = "";
   }
 
+  getChosenValues(props) {
+    console.log(props.chosenpSchedulers)
+    return (
+      <div>
+        <p className="howToBox"><b>Key:</b>{(this.state.chosenKey.length > 0) ?this.state.chosenKey[0].value : ""} </p>
+        <p className="howToBox"><b>Search:</b> {this.state.searchTerm}</p>
+        <p className="howToBox"><b>Communities:</b>{this.state.selectedGroupCommunity} </p>
+        <p className="howToBox"><b>pScheduler:</b>{props.chosenpSchedulers.toString()}</p>
+      </div>
+    );
+  }
+
 
 
   render() {
@@ -313,7 +328,9 @@ class App extends Component {
         <Jumbotron className="head">
           <div className="grid-container">
             <div className="grid-item" id="textBox2">
-             <br></br>
+            <br></br>
+              <h5>Chosen values</h5>
+              <this.getChosenValues chosenpSchedulers={this.state.chosenSchedulers}></this.getChosenValues>
             </div>
             <div className="grid-item">
               <div>
