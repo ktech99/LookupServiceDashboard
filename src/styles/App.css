@@ -131,10 +131,12 @@ li.sc-bxivhb.iRISHI {
 }
 
 /* Sidebar css */
+
 .flex-column.nav.nav-pills {
   border: 1px solid grey;
   border-radius: 7px;
   text-align: center;
+  margin-left: 30px;
 }
 
 div#serviceTab {
