@@ -300,7 +300,7 @@ class App extends Component {
       ul.removeChild(lis[0]);
     }
     selector.className = "sc-bwzfXH LBGII";
-    selector.placeholder = "Eneter a key (optional) : ";
+    selector.placeholder = "key (optional) : ";
     var searchBar = document.getElementById("searchBar");
     searchBar.value = "";
   }
@@ -312,11 +312,13 @@ class App extends Component {
       <div>
         <Jumbotron className="head">
           <div className="grid-container">
-            <div className="grid-item" />
+            <div className="grid-item" id="textBox2">
+             <br></br>
+            </div>
             <div className="grid-item">
               <div>
                 <Search items={this.state.keys}
-                  placeholder="Eneter a key (optional) : "
+                  placeholder="key (optional) : "
                   maxSelected={1}
                   multiple={true}
                   onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
@@ -349,10 +351,10 @@ class App extends Component {
             <div className="grid-item" id="textbox">
               <br></br>
               <h5>How to use the LS Directory</h5>
-                <p className = "howToBox"><b>Key:</b> The key signifies the "key" in the key-value schema of the database</p>
-                <p className = "howToBox"><b>Search:</b> The search is the value needed for the selected key</p>
-                <p className = "howToBox"><b>Communities:</b> Filter for the group community value</p>
-                <p className = "howToBox"><b>pScheduler:</b> Filter for the pScheduler tests</p>
+              <p className="howToBox"><b>Key:</b> The key signifies the "key" in the key-value schema of the database</p>
+              <p className="howToBox"><b>Search:</b> The search is the value needed for the selected key</p>
+              <p className="howToBox"><b>Communities:</b> Filter for the group community value</p>
+              <p className="howToBox"><b>pScheduler:</b> Filter for the pScheduler tests</p>
             </div>
           </div>
 
