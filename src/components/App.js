@@ -8,6 +8,7 @@ import dot from "../image/dot.png"
 import ChosenBox from "./ChosenBox"
 import GroupCommunities from "./GroupCommunities"
 import Scheduler from "./Scheduler"
+import HostTable from "./HostTable"
 
 
 // import Map from "./Map"
@@ -69,8 +70,6 @@ class App extends Component {
 
     this.groupCommunitiesCallbackFunction = this.groupCommunitiesCallbackFunction.bind(this);
     this.searchHost = this.searchHost.bind(this);
-    this.getHost = this.getHost.bind(this);
-    this.chooseHost = this.chooseHost.bind(this);
     this.searchService = this.searchService.bind(this)
     this.getService = this.getService.bind(this);
     this.hostTableNext = this.hostTableNext.bind(this);
@@ -160,42 +159,11 @@ class App extends Component {
       this.setState({ serviceVisibility: true });
       document.getElementById("informationTabs-tab-first").click();
     }
-    // console.log(this.state.hostResults)
   }
 
-  getHost(props) {
-    console.log("")
-
-    const hostInformation = props.hostInformation;
-    const hostTable = hostInformation.slice(this.state.tableStart, this.state.tableEnd).map((host) =>
-      <tr key={host["Host Name"]} >
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Host Name"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Hardware"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["System Info"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Toolkit Version"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["Communities"]}</td>
-        <td onClick={() => { this.chooseHost(host["URI"], host["latitude"], host["longitude"]) }}>{host["pSchedulers"]}</td>
-        <td><Button variant="warning" onClick={() => { this.showHostJSON({ host }) }}>View JSON</Button></td>
-      </tr>
-    );
-    return (
-      <tbody>
-        {hostTable}
-      </tbody>
-    );
-  }
-
-  chooseHost(hostName, latitude, longitude) {
-    console.log("")
-
+  hostTableCallBackFunction = (hostName, latitude, longitude) =>{
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService("all") })
-    // this.searchService()
-  }
-
-  showHostJSON(host) {
-    console.log("")
-    alert(host["host"]["JSON"])
   }
 
   chooseHostFromMap(hostName, type) {
@@ -385,7 +353,8 @@ class App extends Component {
                         <th>JSON</th>
                       </tr>
                     </thead>
-                    <this.getHost hostInformation={this.state.hostResults} />
+                    <HostTable hostInformation={this.state.hostResults} parentCallBack={this.hostTableCallBackFunction} tableStart={this.state.tableStart} tableEnd = {this.state.tableEnd}/>
+                    {/* <this.getHost hostInformation={this.state.hostResults} /> */}
                   </Table>
                 </Tab.Pane>
                 <Tab.Pane eventKey="second">
