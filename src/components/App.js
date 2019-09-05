@@ -64,7 +64,7 @@ class App extends Component {
       chosenLat: 0,
       chosenLong: 0,
       showMap: true,
-      allCoordinates: []
+      allCoordinates: [],
     }
 
     this.getCommunities = this.getCommunities.bind(this);
@@ -137,7 +137,6 @@ class App extends Component {
       <label key={scheduler}>
         <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
           // console.log(this.state.chosenSchedulers);
-          console.log({scheduler}.scheduler)
           var outer = {scheduler}.scheduler
           const contains = this.state.chosenSchedulers.includes({scheduler}.scheduler);
           if (contains) {
@@ -182,7 +181,12 @@ class App extends Component {
     } else {
       var key = ""
     }
-    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=100", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    if(key !== "" & this.state.searchTerm === ""){
+      alert("key must have a value specified")
+    }else if( key === "" & this.state.searchTerm !== ""){
+      alert("search must have a value specified")
+    }else{
+    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ hostResults: data })
@@ -190,6 +194,7 @@ class App extends Component {
       .catch(console.log)
     this.setState({ serviceVisibility: true });
     document.getElementById("informationTabs-tab-first").click();
+    }
     // console.log(this.state.hostResults)
   }
 
@@ -278,6 +283,7 @@ class App extends Component {
   }
 
   clear() {
+    var key = this.state.keys
     this.setState({
       selectedGroupCommunity: "",
       chosenSchedulers: [],
@@ -292,7 +298,8 @@ class App extends Component {
       chosenLat: 0,
       chosenLong: 0,
       showMap: true,
-    })
+    }, function(){console.log(this.state.keys)
+    this.setState({keys:key})})
     var communityDrop = document.getElementById("communitiesdropDown");
     communityDrop.textContent = "Group communities";
     var box = document.getElementsByClassName('schedulerCheckBox');
@@ -300,28 +307,20 @@ class App extends Component {
       if (box[i].type === 'checkbox')
         box[i].checked = false;
     }
-    var selector = document.getElementById("search-input");
-    console.log(selector.value)
-    var ul = document.getElementsByClassName("sc-htpNat cqaNcS")[0];
-    console.log(ul)
-    var lis = (ul.getElementsByTagName("li"))
-    if (lis.length > 0) {
-      ul.removeChild(lis[0]);
-    }
-    selector.className = "sc-bwzfXH LBGII";
-    selector.placeholder = "key (optional) : ";
+
     var searchBar = document.getElementById("searchBar");
     searchBar.value = "";
+    alert("Key needs to be cleared manually")
   }
 
   getChosenValues(props) {
     console.log(props.chosenpSchedulers)
     return (
       <div>
-        <p className="howToBox"><b>Key:</b>{(this.state.chosenKey.length > 0) ?this.state.chosenKey[0].value : ""} </p>
-        <p className="howToBox"><b>Search:</b> {this.state.searchTerm}</p>
-        <p className="howToBox"><b>Communities:</b>{this.state.selectedGroupCommunity} </p>
-        <p className="howToBox"><b>pScheduler:</b>{props.chosenpSchedulers.toString()}</p>
+        <p className="howToBox"><b>Key:&nbsp;</b>{(this.state.chosenKey.length > 0) ?this.state.chosenKey[0].value : ""} </p>
+        <p className="howToBox"><b>Search:&nbsp;</b> {this.state.searchTerm}</p>
+        <p className="howToBox"><b>Communities:&nbsp;</b>{this.state.selectedGroupCommunity} </p>
+        <p className="howToBox"><b>pScheduler:&nbsp;</b>{props.chosenpSchedulers.toString()}</p>
       </div>
     );
   }
@@ -402,6 +401,7 @@ class App extends Component {
               <Tab.Content>
                 <Tab.Pane eventKey="first">
                   <div className="prevNextButton">
+                    <h7 className = "queryResults" hidden = {this.state.hostResults.length === 0}>This query returned {this.state.hostResults.length} results</h7>
                     <Button variant="info" onClick={this.hostTablePrev} className="prevButton">Previous</Button>
                     <Button variant="danger" onClick={this.hostTableNext} className="nextButton">Next</Button>
                   </div>

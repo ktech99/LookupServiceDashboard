@@ -5,11 +5,11 @@
 
 .head{
   /* background-color: #0099ff !important; */
-  background-color: white !important;
+  background-color: rgba(194, 194, 194, 0.192) !important;
   height:100%;
   width:100%;
   text-align: center !important;
-  border: 1px solid grey;
+  /* border: 1px solid grey; */
   /* margin-left: 15px; */
 }
 
@@ -34,14 +34,15 @@
   border-radius: 5px !important;
   border: 0 !important; 
   height: 40px !important;
-  width: 100% !important;
+  /* width: 100% !important;
+  min-width: 155px; */
   text-align: center !important;
   margin: 0%;
   background-color:rgb(255,255,255) !important;
   opacity:1 !important;
   display: inline-block;
   font-size: 1rem;
-    font-weight: 400;
+    font-weight: 200;
     line-height: 1.5;
 }
 .sc-bdVaJa.bPcRQP {
@@ -60,6 +61,9 @@ li.sc-bxivhb.iRISHI {
   border-radius: 5px !important;
 }
 
+ul.sc-htpNat.cqaNcS{
+  max-height: 200px;
+}
 /* End autofill css settings */
 
 
@@ -143,6 +147,11 @@ li.sc-bxivhb.iRISHI {
   text-align:left !important;
   margin-left: 10px;
   
+}
+
+.queryResults{
+  display: inline;
+  margin-right: 30px
 }
 
 /* Sidebar css */
