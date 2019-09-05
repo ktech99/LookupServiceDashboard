@@ -9,6 +9,7 @@ import ChosenBox from "./ChosenBox"
 import GroupCommunities from "./GroupCommunities"
 import Scheduler from "./Scheduler"
 import HostTable from "./HostTable"
+import Mapper from "./Mapper"
 
 
 // import Map from "./Map"
@@ -375,16 +376,12 @@ class App extends Component {
                 </Tab.Pane>
                 <Tab.Pane eventKey="third">
                   <div className="map">
-                    <Map
+                    <Mapper
                       lat={this.state.chosenLat}
                       long={this.state.chosenLong}
                       all={this.state.allCoordinates}
                       hostResults={this.state.hostResults}
                       chooseHostCallback={this.chooseHostFromMap}
-                      googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
-                      loadingElement={<div style={{ height: `100%` }} />}
-                      containerElement={<div style={{ height: `600px`, width: `100%` }} />}
-                      mapElement={<div style={{ height: `100%` }} />}
                     />
                   </div>
                 </Tab.Pane>
