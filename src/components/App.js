@@ -137,9 +137,15 @@ class App extends Component {
       <label key={scheduler}>
         <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
           // console.log(this.state.chosenSchedulers);
-          const contains = this.state.chosenSchedulers.includes({ scheduler }.scheduler);
+          console.log({scheduler}.scheduler)
+          var outer = {scheduler}.scheduler
+          const contains = this.state.chosenSchedulers.includes({scheduler}.scheduler);
           if (contains) {
-            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) { return scheduler !== { scheduler }.scheduler });
+            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) { 
+              console.log(scheduler + ":" + outer)
+              return scheduler !== outer
+            });
+            console.log(remainingItems)
             this.setState({ chosenSchedulers: remainingItems });
           } else {
             this.state.chosenSchedulers.push({ scheduler }.scheduler)
@@ -291,7 +297,7 @@ class App extends Component {
     communityDrop.textContent = "Group communities";
     var box = document.getElementsByClassName('schedulerCheckBox');
     for (var i = 0; i < box.length; i++) {
-      if (box[i].type == 'checkbox')
+      if (box[i].type === 'checkbox')
         box[i].checked = false;
     }
     var selector = document.getElementById("search-input");
