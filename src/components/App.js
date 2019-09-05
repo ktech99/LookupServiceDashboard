@@ -6,6 +6,8 @@ import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import Mark from "./Mark";
 import dot from "../image/dot.png"
 import ChosenBox from "./ChosenBox"
+import GroupCommunities from "./GroupCommunities"
+import Scheduler from "./Scheduler"
 
 
 // import Map from "./Map"
@@ -65,8 +67,7 @@ class App extends Component {
       allCoordinates: [],
     }
 
-    this.getCommunities = this.getCommunities.bind(this);
-    this.getPschedulers = this.getPschedulers.bind(this);
+    this.groupCommunitiesCallbackFunction = this.groupCommunitiesCallbackFunction.bind(this);
     this.searchHost = this.searchHost.bind(this);
     this.getHost = this.getHost.bind(this);
     this.chooseHost = this.chooseHost.bind(this);
@@ -111,54 +112,12 @@ class App extends Component {
       .catch(console.log)
   }
 
-  getCommunities(props) {
-    console.log("")
-    const communities = props.communities;
-    const listCommunities = communities.map((community) =>
-      <Dropdown.Item id={community} key={community} as={Button}
-        onClick={() => {
-          var current = document.getElementById("communitiesdropDown");
-          current.textContent = "Communities: " + { community }.community; // changing dropdown name
-          this.setState({ selectedGroupCommunity: { community }.community })
-        }}>
-        {community}
+  groupCommunitiesCallbackFunction = (selected) => {
+    this.setState({ selectedGroupCommunity: selected})
+}
 
-      </Dropdown.Item>
-    );
-    return (
-      <Dropdown.Menu className="scrollBox">{listCommunities}</Dropdown.Menu>
-    );
-  }
-
-  getPschedulers(props) {
-    console.log("")
-
-    const pSchedulers = props.pSchedulers;
-    const listSchedulers = pSchedulers.map((scheduler) =>
-      <label key={scheduler}>
-        <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
-          var outer = { scheduler }.scheduler
-          const contains = this.state.chosenSchedulers.includes(outer);
-          if (contains) {
-            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) {
-              return scheduler !== outer
-            });
-            this.setState({ chosenSchedulers: remainingItems });
-          } else {
-            this.state.chosenSchedulers.push(outer)
-            this.setState({ chosenSchedulers: this.state.chosenSchedulers })
-          }
-
-        }}>
-        </input>
-        {scheduler}
-      </label>
-    );
-    return (
-      <Dropdown.Menu className="scrollBox">
-        {listSchedulers}
-      </Dropdown.Menu>
-    );
+  schedulerCallbackFunction= (selected) =>{
+    this.setState({ chosenSchedulers: selected })
   }
 
   updateSearch() {
@@ -366,21 +325,10 @@ class App extends Component {
                 <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
               </div>
               <div className="dropdownDiv">
-                <Dropdown className="dropdownDiv">
-                  <Dropdown.Toggle variant="dark" id="communitiesdropDown">
-                    Group communities
-            </Dropdown.Toggle>
-                  <this.getCommunities communities={this.state.groupCommunities} />
-                </Dropdown>
+  
+                <GroupCommunities communities={this.state.groupCommunities} parentCallBack = {this.groupCommunitiesCallbackFunction}/>
+                <Scheduler pSchedulers = {this.state.pSchedulerTests} parentCallBack={this.schedulerCallbackFunction} chosenSchedulers = {this.state.chosenSchedulers}/>
 
-                <Dropdown className="dropdownDiv">
-                  <Dropdown.Toggle variant="dark" id="dropdown-basic">
-                    pScheduler Tests
-            </Dropdown.Toggle>
-
-                  <this.getPschedulers pSchedulers={this.state.pSchedulerTests} />
-
-                </Dropdown>
               </div>
               <div>
                 <div className="inlineButtons">
