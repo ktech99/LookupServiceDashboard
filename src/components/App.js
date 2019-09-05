@@ -5,9 +5,7 @@ import Search from "react-search"
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import Mark from "./Mark";
 import dot from "../image/dot.png"
-import { get } from 'http';
-import ReactDOM from "react-dom";
-import { thisExpression } from '@babel/types';
+import ChosenBox from "./ChosenBox"
 
 
 // import Map from "./Map"
@@ -114,6 +112,7 @@ class App extends Component {
   }
 
   getCommunities(props) {
+    console.log("")
     const communities = props.communities;
     const listCommunities = communities.map((community) =>
       <Dropdown.Item id={community} key={community} as={Button}
@@ -132,23 +131,22 @@ class App extends Component {
   }
 
   getPschedulers(props) {
+    console.log("")
+
     const pSchedulers = props.pSchedulers;
     const listSchedulers = pSchedulers.map((scheduler) =>
       <label key={scheduler}>
         <input type="checkbox" className="schedulerCheckBox" id={scheduler} onClick={() => {
-          // console.log(this.state.chosenSchedulers);
-          var outer = {scheduler}.scheduler
-          const contains = this.state.chosenSchedulers.includes({scheduler}.scheduler);
+          var outer = { scheduler }.scheduler
+          const contains = this.state.chosenSchedulers.includes(outer);
           if (contains) {
-            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) { 
-              console.log(scheduler + ":" + outer)
+            var remainingItems = this.state.chosenSchedulers.filter(function (scheduler) {
               return scheduler !== outer
             });
-            console.log(remainingItems)
             this.setState({ chosenSchedulers: remainingItems });
           } else {
-            this.state.chosenSchedulers.push({ scheduler }.scheduler)
-            this.setState({chosenSchedulers: this.state.chosenSchedulers})
+            this.state.chosenSchedulers.push(outer)
+            this.setState({ chosenSchedulers: this.state.chosenSchedulers })
           }
 
         }}>
@@ -164,10 +162,14 @@ class App extends Component {
   }
 
   updateSearch() {
+    console.log("")
+
     this.setState({ searchTerm: document.getElementById("searchBar").value })
   }
 
   keySelect(items) {
+    console.log("")
+
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
     }
@@ -176,29 +178,35 @@ class App extends Component {
   }
 
   searchHost() {
+    console.log("")
+
     if (this.state.chosenKey.length !== 0) {
       var key = this.state.chosenKey[0]["value"]
     } else {
       var key = ""
     }
-    if(key !== "" & this.state.searchTerm === ""){
-      alert("key must have a value specified")
-    }else if( key === "" & this.state.searchTerm !== ""){
-      alert("search must have a value specified")
-    }else{
-    fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
-      .then(res => res.json())
-      .then((data) => {
-        this.setState({ hostResults: data })
-      })
-      .catch(console.log)
-    this.setState({ serviceVisibility: true });
-    document.getElementById("informationTabs-tab-first").click();
+    if (key !== "" & this.state.searchTerm === "") {
+      alert("Key must have a value specified")
+    } else if (key === "" & this.state.searchTerm !== "") {
+      alert("Search must have a value specified")
+    } else if (key === "" & this.state.searchTerm === "" & this.state.selectedGroupCommunity === "" & this.state.chosenSchedulers.length === 0){
+      alert("Please fill in fields before searching")
+    } else {
+      fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+        .then(res => res.json())
+        .then((data) => {
+          this.setState({ hostResults: data })
+        })
+        .catch(console.log)
+      this.setState({ serviceVisibility: true });
+      document.getElementById("informationTabs-tab-first").click();
     }
     // console.log(this.state.hostResults)
   }
 
   getHost(props) {
+    console.log("")
+
     const hostInformation = props.hostInformation;
     const hostTable = hostInformation.slice(this.state.tableStart, this.state.tableEnd).map((host) =>
       <tr key={host["Host Name"]} >
@@ -219,22 +227,26 @@ class App extends Component {
   }
 
   chooseHost(hostName, latitude, longitude) {
+    console.log("")
+
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService("all") })
     // this.searchService()
   }
 
   showHostJSON(host) {
-    console.log(host)
+    console.log("")
     alert(host["host"]["JSON"])
   }
 
   chooseHostFromMap(hostName, type) {
+    console.log("")
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName }, function () { this.searchService(type) })
   }
 
   searchService(type) {
+    console.log("")
     fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost + "&type=" + type, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
       .then(res => res.json())
       .then((data) => {
@@ -246,6 +258,7 @@ class App extends Component {
   }
 
   getService(props) {
+    console.log("")
     const serviceInformation = props.serviceInformation;
     const serviceTable = serviceInformation.map((service) =>
       <tr key={Math.random()} >
@@ -266,19 +279,23 @@ class App extends Component {
   }
 
   hostTableNext() {
+    console.log("")
+
     if (this.state.hostResults.length > this.state.tableEnd) {
       this.setState({ tableEnd: this.state.tableEnd + 10, tableStart: this.state.tableStart + 10 })
     }
   }
 
   hostTablePrev() {
+    console.log("")
+
     if (this.state.tableStart - 10 >= 0) {
       this.setState({ tableEnd: this.state.tableEnd - 10, tableStart: this.state.tableStart - 10 })
     }
   }
 
   showServiceJSON(host) {
-    console.log(host)
+    console.log("")
     alert(host["service"]["JSON"])
   }
 
@@ -298,8 +315,10 @@ class App extends Component {
       chosenLat: 0,
       chosenLong: 0,
       showMap: true,
-    }, function(){console.log(this.state.keys)
-    this.setState({keys:key})})
+    }, function () {
+      console.log(this.state.keys)
+      this.setState({ keys: key })
+    })
     var communityDrop = document.getElementById("communitiesdropDown");
     communityDrop.textContent = "Group communities";
     var box = document.getElementsByClassName('schedulerCheckBox');
@@ -314,10 +333,10 @@ class App extends Component {
   }
 
   getChosenValues(props) {
-    console.log(props.chosenpSchedulers)
+    console.log("")
     return (
       <div>
-        <p className="howToBox"><b>Key:&nbsp;</b>{(this.state.chosenKey.length > 0) ?this.state.chosenKey[0].value : ""} </p>
+        <p className="howToBox"><b>Key:&nbsp;</b>{(this.state.chosenKey.length > 0) ? this.state.chosenKey[0].value : ""} </p>
         <p className="howToBox"><b>Search:&nbsp;</b> {this.state.searchTerm}</p>
         <p className="howToBox"><b>Communities:&nbsp;</b>{this.state.selectedGroupCommunity} </p>
         <p className="howToBox"><b>pScheduler:&nbsp;</b>{props.chosenpSchedulers.toString()}</p>
@@ -333,9 +352,9 @@ class App extends Component {
         <Jumbotron className="head">
           <div className="grid-container">
             <div className="grid-item" id="textBox2">
-            <br></br>
+              <br></br>
               <h5>Chosen values</h5>
-              <this.getChosenValues chosenpSchedulers={this.state.chosenSchedulers}></this.getChosenValues>
+              <ChosenBox chosenpSchedulers={this.state.chosenSchedulers} chosenKey={this.state.chosenKey} searchTerm={this.state.searchTerm} selectedGroupCommunity={this.state.selectedGroupCommunity}></ChosenBox>
             </div>
             <div className="grid-item">
               <div>
@@ -401,7 +420,7 @@ class App extends Component {
               <Tab.Content>
                 <Tab.Pane eventKey="first">
                   <div className="prevNextButton">
-                    <h7 className = "queryResults" hidden = {this.state.hostResults.length === 0}>This query returned {this.state.hostResults.length} results</h7>
+                    <p className="queryResults" hidden={this.state.hostResults.length === 0}>This query returned {this.state.hostResults.length} results</p>
                     <Button variant="info" onClick={this.hostTablePrev} className="prevButton">Previous</Button>
                     <Button variant="danger" onClick={this.hostTableNext} className="nextButton">Next</Button>
                   </div>
