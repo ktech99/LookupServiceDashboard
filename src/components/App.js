@@ -2,17 +2,12 @@ import React, { Component } from 'react';
 import '../styles/App.css';
 import { Jumbotron, Button, Table, Tab, Row, Col, Nav } from 'react-bootstrap'
 import Search from "react-search"
-import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
-import Mark from "./Mark";
-import dot from "../image/dot.png"
 import ChosenBox from "./ChosenBox"
 import GroupCommunities from "./GroupCommunities"
 import Scheduler from "./Scheduler"
 import HostTable from "./HostTable"
 import Mapper from "./Mapper"
-
-
-// import Map from "./Map"
+import { serverURL, hostURL } from "./config/config"
 
 class App extends Component {
 
@@ -37,6 +32,7 @@ class App extends Component {
       chosenLong: 0,
       showMap: true,
       allCoordinates: [],
+      serviceAddress: ""
     }
 
     this.groupCommunitiesCallbackFunction = this.groupCommunitiesCallbackFunction.bind(this);
@@ -51,15 +47,14 @@ class App extends Component {
   }
 
   componentDidMount() {
-
-    fetch('http://localhost:8080/groupCommunities', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/groupCommunities', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ groupCommunities: data })
       })
       .catch(console.log)
 
-    fetch('http://localhost:8080/getAllKeys', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/getAllKeys', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         data = data.map(value => ({ id: 1, value: value }))
@@ -67,14 +62,14 @@ class App extends Component {
       })
       .catch(console.log)
 
-    fetch('http://localhost:8080/pSchedulerTests', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/pSchedulerTests', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ pSchedulerTests: data })
       })
       .catch(console.log)
 
-    fetch('http://localhost:8080/getCoordinates', { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/getCoordinates', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ allCoordinates: data })
@@ -91,14 +86,10 @@ class App extends Component {
   }
 
   updateSearch() {
-    console.log("")
-
     this.setState({ searchTerm: document.getElementById("searchBar").value })
   }
 
   keySelect(items) {
-    console.log("")
-
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
     } else {
@@ -109,8 +100,6 @@ class App extends Component {
   }
 
   searchHost() {
-    console.log("")
-
     if (this.state.chosenKey.length !== 0) {
       var key = this.state.chosenKey[0]["value"]
     } else {
@@ -123,7 +112,7 @@ class App extends Component {
     } else if (key === "" & this.state.searchTerm === "" & this.state.selectedGroupCommunity === "" & this.state.chosenSchedulers.length === 0) {
       alert("Please fill in fields before searching")
     } else {
-      fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      fetch(serverURL + '/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': hostURL } })
         .then(res => res.json())
         .then((data) => {
           this.setState({ hostResults: data })
@@ -134,37 +123,33 @@ class App extends Component {
     }
   }
 
-  hostTableCallBackFunction = (hostName, latitude, longitude) => {
+  hostTableCallBackFunction = (hostName, latitude, longitude, address) => {
     this.setState({ serviceVisibility: false });
-    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService("all") })
+    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude, serviceAddress: address }, function () { this.searchService("all") })
   }
 
   chooseHostFromMap(hostName, type) {
-    console.log("")
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName }, function () { this.searchService(type) })
   }
 
   searchService(type) {
-    console.log("")
-    fetch('http://localhost:8080/searchService?hosts=' + this.state.chosenHost + "&type=" + type, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/searchService?hosts=' + this.state.chosenHost + "&type=" + type, { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ serviceResults: data })
       })
       .catch(console.log)
-    console.log(this.state.serviceResults)
     document.getElementById("informationTabs-tab-second").click();
   }
 
   getService(props) {
-    console.log("")
     const serviceInformation = props.serviceInformation;
     const serviceTable = serviceInformation.map((service) =>
       <tr key={Math.random()} >
         <td>{service["name"]} - {service["type"]}</td>
-        <td>{service["address"]}</td>
-        <td>{this.state.chosenLat} , {this.state.chosenLong}</td>
+        <td>{this.state.serviceAddress}</td>
+        <td>{this.state.chosenLat} , {this.state.chosenLong}<br /> {service["locationString"]}</td>
         <td>{service["communities"]}</td>
         <td>{service["version"]}</td>
         <td><Button variant="warning" onClick={() => { this.showServiceJSON({ service }) }}>View JSON</Button></td>
@@ -178,23 +163,18 @@ class App extends Component {
   }
 
   hostTableNext() {
-    console.log("")
-
     if (this.state.hostResults.length > this.state.tableEnd) {
       this.setState({ tableEnd: this.state.tableEnd + 10, tableStart: this.state.tableStart + 10 })
     }
   }
 
   hostTablePrev() {
-    console.log("")
-
     if (this.state.tableStart - 10 >= 0) {
       this.setState({ tableEnd: this.state.tableEnd - 10, tableStart: this.state.tableStart - 10 })
     }
   }
 
   showServiceJSON(host) {
-    console.log("")
     alert(host["service"]["JSON"])
   }
 
@@ -215,7 +195,6 @@ class App extends Component {
       chosenLong: 0,
       showMap: true,
     }, function () {
-      console.log(this.state.keys)
       this.setState({ keys: key })
     })
     var communityDrop = document.getElementById("communitiesdropDown");
@@ -232,7 +211,6 @@ class App extends Component {
   }
 
   getChosenValues(props) {
-    console.log("")
     return (
       <div>
         <p className="howToBox"><b>Key:&nbsp;</b>{(this.state.chosenKey.length > 0) ? this.state.chosenKey[0].value : ""} </p>
@@ -366,4 +344,3 @@ class App extends Component {
 };
 
 export default App;
- 

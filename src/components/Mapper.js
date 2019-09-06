@@ -2,6 +2,7 @@ import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import React from 'react';
 import Mark from "./Mark";
 import dot from "../image/dot.png"
+import {googleMapsApiKey} from "./config/config"
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
@@ -44,7 +45,7 @@ const Map = withScriptjs(withGoogleMap((props) => {
             all={this.props.all}
             hostResults={this.props.hostResults}
             chooseHostCallback={this.chooseHostCallback}
-            googleMapURL={`https://maps.googleapis.com/maps/api/js?key=AIzaSyAEW46KVttk6w0Ik_-hKNl7XqQ31t07q0U&v=3.exp&libraries=geometry,drawing,places`}
+            googleMapURL={"https://maps.googleapis.com/maps/api/js?key="+{googleMapsApiKey}.googleMapsApiKey+"&v=3.exp&libraries=geometry,drawing,places"}
             loadingElement={<div style={{ height: `100%` }} />}
             containerElement={<div style={{ height: `600px`, width: `100%` }} />}
             mapElement={<div style={{ height: `100%` }} />}

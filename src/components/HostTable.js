@@ -6,14 +6,15 @@ export default class HostTable extends React.PureComponent {
 
     getHost(props) {    
         const hostInformation = props.hostInformation;
+        console.log(hostInformation)
         const hostTable = hostInformation.slice(props.tableStart, props.tableEnd).map((host) =>
           <tr key={host["Host Name"]} >
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack)}}>{host["Host Name"]}</td>
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack) }}>{host["Hardware"]}</td>
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack) }}>{host["System Info"]}</td>
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack) }}>{host["Toolkit Version"]}</td>
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack) }}>{host["Communities"]}</td>
-            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], props.parentCallBack) }}>{host["pSchedulers"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"], props.parentCallBack)}}>{host["Host Name"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"],props.parentCallBack) }}>{host["Hardware"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"],props.parentCallBack) }}>{host["System Info"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"],props.parentCallBack) }}>{host["Toolkit Version"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"],props.parentCallBack) }}>{host["Communities"]}</td>
+            <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"],props.parentCallBack) }}>{host["pSchedulers"]}</td>
             <td><Button variant="warning" onClick={() => { props.showHostJSON({ host }) }}>View JSON</Button></td>
           </tr>
         );
@@ -28,8 +29,8 @@ export default class HostTable extends React.PureComponent {
         alert(host["host"]["JSON"])
       }
 
-      chooseHost(hostName, latitude, longitude, parentCallBack) {
-        parentCallBack(hostName, latitude, longitude);
+      chooseHost(hostName, latitude, longitude, address, parentCallBack) {
+        parentCallBack(hostName, latitude, longitude, address);
       }
 
     render() {

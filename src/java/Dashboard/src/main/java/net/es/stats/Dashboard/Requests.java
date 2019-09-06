@@ -144,15 +144,18 @@ public class Requests {
       int interfaceCount = 1;
       String interfaceHardware = "";
       String pschedulerTests = "";
+      String interfaceAddresses = "";
 
       for (SearchHit interfaceHit : interfaceHits) {
         Map<String, Object> interfaceMap = interfaceHit.getSourceAsMap();
+        System.out.println(interfaceMap);
         interfaceHardware = "NIC #" + interfaceCount + " Speed: " + "\n";
         // Todo speed?
         interfaceHardware +=
             "NIC #" + interfaceCount + " MTU: " + interfaceMap.get("interface-mtu");
         pschedulerTests = tryGet(interfaceMap, "pscheduler-tests");
         interfaceCount++;
+        interfaceAddresses = tryGet(interfaceMap, "interface-addresses");
       }
 
       hardware.append(processor);
@@ -186,6 +189,7 @@ public class Requests {
       hostMap.put("JSON", sourceMap.toString());
       hostMap.put("latitude", latitude);
       hostMap.put("longitude", longitude);
+      hostMap.put("interfaceAddress", interfaceAddresses);
       setMap.add(hostMap);
     }
     client.close();
@@ -201,7 +205,8 @@ public class Requests {
    * @throws IOException if unable to connect to database
    */
   @GetMapping("/searchService")
-  public Set<Map<String, String>> searchService(@RequestParam String hosts, @RequestParam String type) throws IOException {
+  public Set<Map<String, String>> searchService(
+      @RequestParam String hosts, @RequestParam String type) throws IOException {
     RestHighLevelClient client = initClient();
     String[] hostArray = hosts.split(",");
 
@@ -213,21 +218,22 @@ public class Requests {
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
         Map<String, Object> searchMap = searchHit.getSourceAsMap();
+//        System.out.println(searchMap);
         Map<String, String> serviceMap = new HashMap<>();
         String serviceType = tryGet(searchMap, "service-type");
         if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase(serviceType)) {
           String name = tryGet(searchMap, "service-name");
           String address = ""; // todo address
-          String location = ""; // todo location
           String communities = tryGet(searchMap, "group-communities");
           String version = tryGet(searchMap, "service-version");
-
+          String locationState = tryGet(searchMap, "location-state");
+          String locationCity = tryGet(searchMap, "location-city");
           serviceMap.put("name", name);
           serviceMap.put("address", address);
-          serviceMap.put("location", location);
           serviceMap.put("communities", communities);
           serviceMap.put("version", version);
           serviceMap.put("type", serviceType);
+          serviceMap.put("locationString", locationCity + ", " + locationState);
           serviceMap.put("JSON", searchMap.toString());
           mapSet.add(serviceMap);
         }
@@ -253,7 +259,6 @@ public class Requests {
     SearchHit[] searchHits = searchResponse.getHits().getHits();
     for (SearchHit searchHit : searchHits) {
       Map<String, Object> searchMap = searchHit.getSourceAsMap();
-      //      System.out.println(searchMap);
       String latitude = tryGet(searchMap, "location-latitude");
       String longitude = tryGet(searchMap, "location-longitude");
       String hostName = tryGet(searchMap, "host-name");
@@ -275,7 +280,7 @@ public class Requests {
 
     Set<String> mapSet = new HashSet<>();
     for (String host : hosts.split(",")) {
-//      System.out.println(host);
+      //      System.out.println(host);
       SearchResponse searchResponse = searchServiceResponse(client, host);
       SearchHit[] searchHits = searchResponse.getHits().getHits();
       for (SearchHit searchHit : searchHits) {
