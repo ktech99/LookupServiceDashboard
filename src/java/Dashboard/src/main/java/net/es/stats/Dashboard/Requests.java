@@ -221,14 +221,12 @@ public class Requests {
           String location = ""; // todo location
           String communities = tryGet(searchMap, "group-communities");
           String version = tryGet(searchMap, "service-version");
-          String command = ""; // todo command
 
           serviceMap.put("name", name);
           serviceMap.put("address", address);
           serviceMap.put("location", location);
           serviceMap.put("communities", communities);
           serviceMap.put("version", version);
-          serviceMap.put("command", command);
           serviceMap.put("type", serviceType);
           serviceMap.put("JSON", searchMap.toString());
           mapSet.add(serviceMap);

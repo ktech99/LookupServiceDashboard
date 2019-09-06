@@ -167,7 +167,6 @@ class App extends Component {
         <td>{this.state.chosenLat} , {this.state.chosenLong}</td>
         <td>{service["communities"]}</td>
         <td>{service["version"]}</td>
-        <td>{service["command"]}</td>
         <td><Button variant="warning" onClick={() => { this.showServiceJSON({ service }) }}>View JSON</Button></td>
       </tr>
     );
@@ -339,7 +338,6 @@ class App extends Component {
                         <th>geographic Location</th>
                         <th>Communities</th>
                         <th>Version</th>
-                        <th>Example Command</th>
                         <th>JSON</th>
                       </tr>
                     </thead>
