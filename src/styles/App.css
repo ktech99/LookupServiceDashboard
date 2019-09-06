@@ -51,7 +51,8 @@ button#dropdown-basic{
   width: 25%;
   text-align: center;
   margin: 10px;
-  border: 1px solid grey;
+  border: 1px solid grey;  
+  display: inline-block;
 }
 
 /* Information tabs */
@@ -64,8 +65,8 @@ button#dropdown-basic{
   border-radius: 5px !important;
   border: 0 !important; 
   height: 40px !important;
-  /* width: 100% !important;
-  min-width: 155px; */
+  /* width: 100% !important; */
+  min-width: 155px;
   text-align: center !important;
   margin: 0%;
   background-color:rgb(255,255,255) !important;
@@ -113,6 +114,10 @@ ul.sc-htpNat.cqaNcS{
 .inlineButtons {
   display: inline-block;
   margin: 10px;
+}
+
+.inlineSearch{
+  position : relative;
 }
 
 .clearButton {

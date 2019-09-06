@@ -131,6 +131,8 @@ class App extends Component {
 
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
+    }else{
+      this.setState({ chosenKey: "" });
     }
     var selector = document.getElementById("search-input");
     selector.value = "";
@@ -285,11 +287,11 @@ class App extends Component {
               <ChosenBox chosenpSchedulers={this.state.chosenSchedulers} chosenKey={this.state.chosenKey} searchTerm={this.state.searchTerm} selectedGroupCommunity={this.state.selectedGroupCommunity}></ChosenBox>
             </div>
             <div className="grid-item">
-              <div>
+              <div className = "inlineSearch">
                 <Search items={this.state.keys}
                   placeholder="key (optional) : "
                   maxSelected={1}
-                  multiple={true}
+                  multiple={true} 
                   onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
                 <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
               </div>
