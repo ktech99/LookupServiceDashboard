@@ -5,12 +5,42 @@
 
 .head{
   /* background-color: #0099ff !important; */
-  background-color: rgba(194, 194, 194, 0.192) !important;
+  background-color: #1D1E2C !important;
   height:100%;
   width:100%;
   text-align: center !important;
   /* border: 1px solid grey; */
   /* margin-left: 15px; */
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 30% 40% 30%;
+}
+
+.grid-item {
+  text-align: center;
+}
+
+.grid-item#textbox {
+  background-color:rgb(122, 42, 104);
+  border-radius: 10px;
+  color: white;
+}
+
+.grid-item#textBox2 {
+  background-color:rgb(122, 42, 104);
+  border-radius: 10px;
+  color: white;
+}
+
+button#communitiesdropDown{
+  background-color:#59656F;
+
+}
+
+button#dropdown-basic{
+  background-color:#59656F;
 }
 
 
@@ -120,28 +150,7 @@ ul.sc-htpNat.cqaNcS{
   display: inline-block;
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: 30% 40% 30%;
-}
 
-.grid-item {
-  text-align: center;
-}
-
-.grid-item#textbox {
-  background-color:rgb(0,112,255);
-  border-radius: 10px;
-  color: white;
-  border: 1px solid grey;
-}
-
-.grid-item#textBox2 {
-  background-color: rgb(0,112,255);
-  border-radius: 10px;
-  border: 1px solid grey;
-  color: white;
-}
 
 .howToBox{
   text-align:left !important;
@@ -151,7 +160,7 @@ ul.sc-htpNat.cqaNcS{
 
 .queryResults{
   display: inline;
-  margin-right: 30px;
+  margin-right: 30px
 }
 
 /* Sidebar css */
@@ -170,6 +179,7 @@ div#serviceTab {
 
 a#informationTabs-tab-first {
   border-radius: 0px;
+  
 }
 
 a#informationTabs-tab-second {
@@ -178,4 +188,9 @@ a#informationTabs-tab-second {
 
 a#informationTabs-tab-third {
   border-radius: 0px;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: rgb(122, 42, 104) !important;
 }

@@ -1,5 +1,5 @@
 import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
-import React, { Component } from 'react';
+import React from 'react';
 import Mark from "./Mark";
 import dot from "../image/dot.png"
 

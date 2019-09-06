@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Dropdown} from 'react-bootstrap'
+import '../styles/App.css';
 
 
 export default class GroupCommunities extends React.PureComponent {
@@ -34,7 +35,7 @@ export default class GroupCommunities extends React.PureComponent {
     render() {
         return (
             <Dropdown className="dropdownDiv">
-                <Dropdown.Toggle variant="dark" id="communitiesdropDown">
+                <Dropdown.Toggle variant="dark" id="communitiesdropDown" className="communitiesdropDown">
                     Group communities
                  </Dropdown.Toggle>
                 <this.getCommunities communities={this.props.communities} parentCallBack ={this.props.parentCallBack} />
