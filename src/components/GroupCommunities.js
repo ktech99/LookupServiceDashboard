@@ -10,11 +10,9 @@ export default class GroupCommunities extends React.PureComponent {
         this.state = {
 
         }
-        // props.parentCallBack = this.parentCallBack.bind(this)
     }
 
     getCommunities(props) {
-        console.log("")
         const communities = props.communities;
         const listCommunities = communities.map((community) =>
           <Dropdown.Item id={community} key={community} as={Button}

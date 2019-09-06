@@ -5,9 +5,7 @@ import {Dropdown} from 'react-bootstrap'
 export default class Schedulers extends React.PureComponent {
 
 
-    getPschedulers(props) {
-        console.log("")
-    
+    getPschedulers(props) {    
         const pSchedulers = props.pSchedulers;
         const listSchedulers = pSchedulers.map((scheduler) =>
           <label key={scheduler}>

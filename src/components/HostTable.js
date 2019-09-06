@@ -6,7 +6,6 @@ export default class HostTable extends React.PureComponent {
 
     getHost(props) {    
         const hostInformation = props.hostInformation;
-        console.log(hostInformation)
         const hostTable = hostInformation.slice(props.tableStart, props.tableEnd).map((host) =>
           <tr key={host["Host Name"]} >
             <td onClick={() => { props.chooseHost(host["URI"], host["latitude"], host["longitude"], host["interfaceAddress"], props.parentCallBack)}}>{host["Host Name"]}</td>

@@ -100,10 +100,11 @@ class App extends Component {
   }
 
   searchHost() {
+    var key = ""
     if (this.state.chosenKey.length !== 0) {
-      var key = this.state.chosenKey[0]["value"]
+      key = this.state.chosenKey[0]["value"]
     } else {
-      var key = ""
+      key = ""
     }
     if (key !== "" & this.state.searchTerm === "") {
       alert("Key must have a value specified")
