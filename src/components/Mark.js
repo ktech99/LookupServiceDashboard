@@ -4,6 +4,8 @@ import { Marker } from "react-google-maps";
 import dot from "../image/dot.png"
 import { InfoWindow } from 'react-google-maps'
 import { Table } from 'react-bootstrap'
+import { serverURL, hostURL } from "./config/config"
+
 
 
 export default class Mark extends React.Component {
@@ -25,7 +27,7 @@ export default class Mark extends React.Component {
 
   getServiceType(hostName) {
     if (this.state.server.length === 0) {
-      fetch('http://localhost:8080/getTypeOfServiceHost?hosts=' + this.props.hostUri, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+      fetch(serverURL + '/getTypeOfServiceHost?hosts=' + this.props.hostUri, { headers: { 'Access-Control-Allow-Origin': hostURL } })
         .then(res => res.json())
         .then((data) => {
           this.setState({ server: data })
@@ -40,15 +42,12 @@ export default class Mark extends React.Component {
   }
 
   chooseHost(hostName, server) {
-    fetch('http://localhost:8080/searchService?hosts=' + hostName + "&type=" + server, { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
+    fetch(serverURL + '/searchService?hosts=' + hostName + "&type=" + server, { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
         this.setState({ serviceResults: data })
       })
       .catch(console.log)
-    // console.log(this.state.serviceResults)
-    // this.props.setState({ serviceVisibility: false });
-    
     document.getElementById("informationTabs-tab-second").click();
   }
 
@@ -75,7 +74,6 @@ export default class Mark extends React.Component {
                   <this.getServiceType hostName={this.state.server} ></this.getServiceType>
                 </tbody>
               </Table>
-              {/* <this.getServiceType hostName={this.props.hostUri} /> */}
             </div>
 
           </InfoWindow>}
