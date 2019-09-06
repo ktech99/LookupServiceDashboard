@@ -14,36 +14,6 @@ import Mapper from "./Mapper"
 
 // import Map from "./Map"
 
-const Map = withScriptjs(withGoogleMap((props) => {
-
-  const markers = (props.hostResults.length === 0 ? props.all.map(coord => <Mark
-    key={Math.random()}
-    location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
-    host={coord["Host Name"]}
-    hostUri={coord["URI"]}
-    callback={props.chooseHostCallback}
-    icon={dot}
-  />)
-    :
-    props.hostResults.map(coord => <Mark
-      key={Math.random()}
-      location={{ lat: parseFloat(coord.latitude), lng: parseFloat(coord.longitude) }}
-      host={coord["Host Name"]}
-      hostUri={coord["URI"]}
-      callback={props.chooseHostCallback}
-      icon={dot}
-    />));
-  return (
-    <GoogleMap
-      defaultZoom={3}
-      center={{ lat: 37.8715, lng: 122.2730 }}
-    >
-      {markers}
-    </GoogleMap>
-  );
-}
-))
-
 class App extends Component {
 
 
@@ -113,10 +83,10 @@ class App extends Component {
   }
 
   groupCommunitiesCallbackFunction = (selected) => {
-    this.setState({ selectedGroupCommunity: selected})
-}
+    this.setState({ selectedGroupCommunity: selected })
+  }
 
-  schedulerCallbackFunction= (selected) =>{
+  schedulerCallbackFunction = (selected) => {
     this.setState({ chosenSchedulers: selected })
   }
 
@@ -131,7 +101,7 @@ class App extends Component {
 
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
-    }else{
+    } else {
       this.setState({ chosenKey: "" });
     }
     var selector = document.getElementById("search-input");
@@ -150,7 +120,7 @@ class App extends Component {
       alert("Key must have a value specified")
     } else if (key === "" & this.state.searchTerm !== "") {
       alert("Search must have a value specified")
-    } else if (key === "" & this.state.searchTerm === "" & this.state.selectedGroupCommunity === "" & this.state.chosenSchedulers.length === 0){
+    } else if (key === "" & this.state.searchTerm === "" & this.state.selectedGroupCommunity === "" & this.state.chosenSchedulers.length === 0) {
       alert("Please fill in fields before searching")
     } else {
       fetch('http://localhost:8080/search?key=' + key + "&groupCommunity=" + this.state.selectedGroupCommunity + "&pSchedulers=" + this.state.chosenSchedulers + "&searchTerm=" + this.state.searchTerm + "&limit=1000", { headers: { 'Access-Control-Allow-Origin': "http://127.0.0.1:3000" } })
@@ -164,7 +134,7 @@ class App extends Component {
     }
   }
 
-  hostTableCallBackFunction = (hostName, latitude, longitude) =>{
+  hostTableCallBackFunction = (hostName, latitude, longitude) => {
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude }, function () { this.searchService("all") })
   }
@@ -287,18 +257,18 @@ class App extends Component {
               <ChosenBox chosenpSchedulers={this.state.chosenSchedulers} chosenKey={this.state.chosenKey} searchTerm={this.state.searchTerm} selectedGroupCommunity={this.state.selectedGroupCommunity}></ChosenBox>
             </div>
             <div className="grid-item">
-              <div className = "inlineSearch">
+              <div className="inlineSearch">
                 <Search items={this.state.keys}
                   placeholder="key (optional) : "
                   maxSelected={1}
-                  multiple={true} 
+                  multiple={true}
                   onItemsChanged={this.keySelect.bind(this)} className="searchBarField" id="keySelector" />
                 <input type="text" placeholder="Search.." className="searchBar" onChange={this.updateSearch.bind(this)} id="searchBar" />
               </div>
               <div className="dropdownDiv">
-  
-                <GroupCommunities communities={this.state.groupCommunities} parentCallBack = {this.groupCommunitiesCallbackFunction}/>
-                <Scheduler pSchedulers = {this.state.pSchedulerTests} parentCallBack={this.schedulerCallbackFunction} chosenSchedulers = {this.state.chosenSchedulers}/>
+
+                <GroupCommunities communities={this.state.groupCommunities} parentCallBack={this.groupCommunitiesCallbackFunction} />
+                <Scheduler pSchedulers={this.state.pSchedulerTests} parentCallBack={this.schedulerCallbackFunction} chosenSchedulers={this.state.chosenSchedulers} />
 
               </div>
               <div>
@@ -356,7 +326,7 @@ class App extends Component {
                         <th>JSON</th>
                       </tr>
                     </thead>
-                    <HostTable hostInformation={this.state.hostResults} parentCallBack={this.hostTableCallBackFunction} tableStart={this.state.tableStart} tableEnd = {this.state.tableEnd}/>
+                    <HostTable hostInformation={this.state.hostResults} parentCallBack={this.hostTableCallBackFunction} tableStart={this.state.tableStart} tableEnd={this.state.tableEnd} />
                     {/* <this.getHost hostInformation={this.state.hostResults} /> */}
                   </Table>
                 </Tab.Pane>
@@ -398,3 +368,4 @@ class App extends Component {
 };
 
 export default App;
+ 
