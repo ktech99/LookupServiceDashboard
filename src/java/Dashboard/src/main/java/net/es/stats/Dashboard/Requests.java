@@ -220,13 +220,11 @@ public class Requests {
         String serviceType = tryGet(searchMap, "service-type");
         if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase(serviceType)) {
           String name = tryGet(searchMap, "service-name");
-          String address = ""; // todo address
           String communities = tryGet(searchMap, "group-communities");
           String version = tryGet(searchMap, "service-version");
           String locationState = tryGet(searchMap, "location-state");
           String locationCity = tryGet(searchMap, "location-city");
           serviceMap.put("name", name);
-          serviceMap.put("address", address);
           serviceMap.put("communities", communities);
           serviceMap.put("version", version);
           serviceMap.put("type", serviceType);
