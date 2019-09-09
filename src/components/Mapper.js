@@ -2,7 +2,7 @@ import { withScriptjs, withGoogleMap, GoogleMap } from "react-google-maps";
 import React from 'react';
 import Mark from "./Mark";
 import dot from "../image/dot.png"
-import { googleMapsApiKey } from "./config/config"
+import { googleMapsApiKey } from "./config/mapConfig"
 
 const Map = withScriptjs(withGoogleMap((props) => {
 
