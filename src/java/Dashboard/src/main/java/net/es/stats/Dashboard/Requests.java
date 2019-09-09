@@ -164,13 +164,12 @@ public class Requests {
 
       StringBuilder systemInfo = new StringBuilder();
       String osName = tryGet(sourceMap, "host-os-name");
-      String osKernel = tryGet(sourceMap, "host-os-kernal");
+      String osKernel = tryGet(sourceMap, "host-os-kernel");
       systemInfo.append("Operating System: ");
       systemInfo.append(osName);
       systemInfo.append("\n");
       systemInfo.append("Kernal: ");
       systemInfo.append(osKernel);
-      // todo contact
 
       String toolkitVersion = tryGet(sourceMap, "pshost-toolkitversion");
       String communities = tryGet(sourceMap, "group-communities");
