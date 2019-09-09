@@ -11,19 +11,18 @@ import { serverURL, hostURL } from "./config/config"
 
 class App extends Component {
 
-
   constructor() {
     super();
     this.state = {
-      groupCommunities: [],
-      selectedGroupCommunity: "",
-      pSchedulerTests: [],
-      chosenSchedulers: [],
-      keys: [],
-      chosenKey: "",
-      searchTerm: "",
-      tableStart: 0,
-      tableEnd: 10,
+      groupCommunities: [], // initial list of group communities
+      selectedGroupCommunity: "", // selected group community
+      pSchedulerTests: [], // initial list of pscheduler tests
+      chosenSchedulers: [], // chosen pscheduler values
+      keys: [], // initial set of keys for autofill search
+      chosenKey: "", // chosen key
+      searchTerm: "", // typed in search term
+      tableStart: 0, // start of table index
+      tableEnd: 10, // end of table index
       hostResults: [],
       serviceVisibility: true,
       chosenHost: "",
@@ -46,7 +45,11 @@ class App extends Component {
     this.getChosenValues = this.getChosenValues.bind(this);
   }
 
+  /**
+   * Loading initial data from api
+   */
   componentDidMount() {
+    // inital call to get group communities for dropdown
     fetch(serverURL + '/groupCommunities', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
@@ -54,6 +57,7 @@ class App extends Component {
       })
       .catch(console.log)
 
+    // gets all keys for autofill search
     fetch(serverURL + '/getAllKeys', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
@@ -62,6 +66,7 @@ class App extends Component {
       })
       .catch(console.log)
 
+    // get pschedulers for dropdown
     fetch(serverURL + '/pSchedulerTests', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
@@ -69,6 +74,7 @@ class App extends Component {
       })
       .catch(console.log)
 
+    // gets coordinates to initialize map
     fetch(serverURL + '/getCoordinates', { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
       .then((data) => {
@@ -77,18 +83,22 @@ class App extends Component {
       .catch(console.log)
   }
 
+  // callback for selcting community
   groupCommunitiesCallbackFunction = (selected) => {
     this.setState({ selectedGroupCommunity: selected })
   }
 
+  // callback for choosing pScheduler
   schedulerCallbackFunction = (selected) => {
     this.setState({ chosenSchedulers: selected })
   }
 
+  // update search value on change in search box
   updateSearch() {
     this.setState({ searchTerm: document.getElementById("searchBar").value })
   }
 
+  // update chosen key on selecting key from dropdown
   keySelect(items) {
     if (items.length !== 0) {
       this.setState({ chosenKey: items });
@@ -99,6 +109,7 @@ class App extends Component {
     selector.value = "";
   }
 
+  // on search button click search api
   searchHost() {
     var key = ""
     if (this.state.chosenKey.length !== 0) {
@@ -124,16 +135,22 @@ class App extends Component {
     }
   }
 
+  // on click of host in host table
   hostTableCallBackFunction = (hostName, latitude, longitude, address) => {
     this.setState({ serviceVisibility: false });
-    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude, serviceAddress: address }, function () { this.searchService("all") })
+    this.setState({ chosenHost: hostName, chosenLat: latitude, chosenLong: longitude, serviceAddress: address }, 
+      function () { 
+        this.searchService("all") // search for services with all types of servers
+      })
   }
 
+  // on click of host using map
   chooseHostFromMap(hostName, type) {
     this.setState({ serviceVisibility: false });
     this.setState({ chosenHost: hostName }, function () { this.searchService(type) })
   }
 
+  // search service on choosing a host
   searchService(type) {
     fetch(serverURL + '/searchService?hosts=' + this.state.chosenHost + "&type=" + type, { headers: { 'Access-Control-Allow-Origin': hostURL } })
       .then(res => res.json())
