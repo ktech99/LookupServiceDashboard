@@ -34,4 +34,8 @@ java -jar target/Spring-Boot-React-0.0.1-SNAPSHOT.jar
 
 ## Images
 
-![Landing](/ReadmeImages⁩/noSearch.png)
+Searching in the Dashboard
+![Landing](./search.png)
+
+Viewing the map in the dashboard
+![Map](./Map.png)
